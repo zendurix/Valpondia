@@ -79,7 +79,7 @@ void GAME::reset_visibility(Character character)
 
 
 	
-	update_view(character.get_staysOn());
+	FieldOfView::update_view(character.get_staysOn());
 	for (int i = 0; i < MYHEIGHT; i++)
 	{
 		for (int j = 0; j < MYLENGTH; j++)

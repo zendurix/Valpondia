@@ -8,16 +8,24 @@
 #include "GAME.h"
 
 
+class FieldOfView
+{
+private:
+	FieldOfView() = delete;
 
-void update_view(std::shared_ptr<Place>  placeChar);
+	static void update_1qrt(std::shared_ptr<Place> placeChar);
+	static void update_2qrt(std::shared_ptr<Place> placeChar);
+	static void update_3qrt(std::shared_ptr<Place> placeChar);
+	static void update_4qrt(std::shared_ptr<Place> placeChar);
 
-void update_1qrt(std::shared_ptr<Place>  placeChar);
-void update_2qrt(std::shared_ptr<Place>  placeChar);
-void update_3qrt(std::shared_ptr<Place>  placeChar);
-void update_4qrt(std::shared_ptr<Place>  placeChar);
+	static void tracer(std::shared_ptr<Place> startPoint, float angle, int distance);
 
-void tracer(std::shared_ptr<Place>  startPoint, float angle, int distance);
+	static char set_quarter(float& angle);
 
-char set_quarter(float& angle);
+	static std::shared_ptr<Place>  step_tracer(std::shared_ptr<Place> tracer, char& quarter, char&& dir);
 
-std::shared_ptr<Place>  step_tracer(std::shared_ptr<Place>  tracer, char& quarter, char&& dir);
+public:
+	static void update_view(std::shared_ptr<Place> placeChar);
+};
+
+

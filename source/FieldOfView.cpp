@@ -1,12 +1,10 @@
 #include "pch.h"
 #include "FieldOfView.h"
 
-const float PI = 3.1415927f;
-const float ACCURACY = 0.00625f;
-const float DEGREE_STEP = 0.25f;
 
 
-void update_view(std::shared_ptr<Place>  placeChar)
+
+void FieldOfView::update_view(std::shared_ptr<Place>  placeChar)
 {
 	std::thread qrt1(update_1qrt, placeChar);
 	std::thread qrt2(update_2qrt, placeChar);
@@ -20,30 +18,22 @@ void update_view(std::shared_ptr<Place>  placeChar)
 }
 
 
-
-
-
-
-
-
-
-
-void update_1qrt(std::shared_ptr<Place>  placeChar)
+void FieldOfView::update_1qrt(std::shared_ptr<Place>  placeChar)
 {
 	for (float alpha = 0.0f; alpha < 90.0f; alpha += DEGREE_STEP)
 		tracer(placeChar, alpha, placeChar->get_characterHere()->get_view());
 }
-void update_2qrt(std::shared_ptr<Place>  placeChar)
+void FieldOfView::update_2qrt(std::shared_ptr<Place>  placeChar)
 {
 	for (float alpha = 90.0f; alpha < 180.0f; alpha += DEGREE_STEP)
 		tracer(placeChar, alpha, placeChar->get_characterHere()->get_view());
 }
-void update_3qrt(std::shared_ptr<Place>  placeChar)
+void FieldOfView::update_3qrt(std::shared_ptr<Place>  placeChar)
 {
 	for (float alpha = 180.0f; alpha < 270.0f; alpha += DEGREE_STEP)
 		tracer(placeChar, alpha, placeChar->get_characterHere()->get_view());
 }
-void update_4qrt(std::shared_ptr<Place>  placeChar)
+void FieldOfView::update_4qrt(std::shared_ptr<Place>  placeChar)
 {
 	for (float alpha = 270.0f; alpha < 360.0f; alpha += DEGREE_STEP)
 		tracer(placeChar, alpha, placeChar->get_characterHere()->get_view());
@@ -61,7 +51,7 @@ void update_4qrt(std::shared_ptr<Place>  placeChar)
 
 
 
-void tracer(std::shared_ptr<Place>  startPoint, float angle, int distance) // void (*operation)())
+void FieldOfView::tracer(std::shared_ptr<Place>  startPoint, float angle, int distance) // void (*operation)())
 {
 	std::shared_ptr<Place>  tracer = startPoint;
 	char quarter = set_quarter(angle);	
@@ -122,7 +112,7 @@ void tracer(std::shared_ptr<Place>  startPoint, float angle, int distance) // vo
 
 
 
-char set_quarter(float& angle)
+char FieldOfView::set_quarter(float& angle)
 {
 	if (are_same_float(angle, 0.0f) || (angle > 0.0f && angle < 90.0f ))
 	{
@@ -153,7 +143,7 @@ char set_quarter(float& angle)
 
 
 
-std::shared_ptr<Place>  step_tracer(std::shared_ptr<Place>  tracer, char& quarter, char&& dir)
+std::shared_ptr<Place>  FieldOfView::step_tracer(std::shared_ptr<Place>  tracer, char& quarter, char&& dir)
 {// '|' vertical  '-' horizontal   '/' diagonally
 	GAME* game = GAME::getInstance();
 	std::vector<std::vector<std::shared_ptr<Place> >> &fieldArr = game->levelActive->field;

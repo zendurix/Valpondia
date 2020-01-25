@@ -5,8 +5,6 @@
 void Character::loadTexture(sf::Sprite sprite)
 {
 	spriteChar = sprite;
-	
-	;
 }
 
 void Character::move(char direction)
