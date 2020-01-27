@@ -47,7 +47,7 @@ void Level::make_level()
 		}
 		else if (levelType == dungeon)
 		{
-			rooms = make_dung_map_ret_rooms(false);
+			rooms =	BspMapGen::make_dung_map_ret_rooms(field, MAX_LEVEL);
 		}
 		
 	} while (!isPlaceForStairsUp());
@@ -94,7 +94,7 @@ void Level::changeLevelType(lvType levelType)
 		make_cave_map(false, field);
 		break;
 	case dungeon:
-		rooms = make_dung_map_ret_rooms(false);
+		rooms = BspMapGen::make_dung_map_ret_rooms(field, MAX_LEVEL);
 		break;
 	}
 	stairsDown->set_stairsDown(false);
@@ -137,21 +137,3 @@ void Level::RESET_field()
 
 
 
-int Level::getDepth()
-{
-	return depth;
-}
-
-SharedPtr<Place>  Level::get_stairsDown()
-{
-	return stairsDown;
-}
-SharedPtr<Place>  Level::get_stairsUp()
-{
-	return stairsUp;
-}
-
-int Level::getLevelCount()
-{
-	return levelCount;
-}

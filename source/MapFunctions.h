@@ -10,10 +10,9 @@
 
 void make_cave_map(bool testing, std::vector<std::vector<SharedPtr<Place> >> &fieldArr);
 
-std::vector <SharedPtr <Room>> make_dung_map_ret_rooms(bool test);
+//td::vector <SharedPtr <Room>> make_dung_map_ret_rooms(bool test);
 
-void make_room(std::string shape_name, int x, int y, int length1, int length2,
-	SharedPtr <Room> room, std::string orientation = "horizontal", bool bspRoom = false);
+void make_room(std::string shape_name, int x, int y, int length1, int length2, SharedPtr <Room> room);
 
 void make_whole_map_obstacle();
 void make_whole_map_not_obstacle();

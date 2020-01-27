@@ -6,7 +6,8 @@ template <typename T>
 using Vector2D = std::vector <std::vector<T>>;
 template <typename T>
 using SharedPtr = std::shared_ptr<T>;
-
+template <typename T>
+using UniquePtr = std::unique_ptr<T>;
 
 
 // WINDOW SIZES
@@ -26,8 +27,9 @@ const int CHAR_SIZE = 32;  // size of text
 
 // MAKING TREE (generating random map):
 const int MAX_LEVEL = 4;
-const int MIN_SIZE = 5;
+const int MIN_ROOM_SIZE = 5;
 const double ROOM_WALLS_PROPORTION = 3.0 / 8.0;
+const int PLACE_FOR_WALLS = 2;
 //
 
 

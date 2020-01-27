@@ -10,17 +10,20 @@ class Character;
 class Room
 {
 public:
-	typedef struct
+	struct Corner
 	{
 		int x;
 		int y;
 		SharedPtr<Place> cornerPtr;
-	}Corner;
+	};
 
 	Corner cornerNW; //1			   1---------------2
 	Corner cornerNE; //2    		   |    ROOM       |
 	Corner cornerSW; //3			   |    inside     |
 	Corner cornerSE; //4			   3---------------4
+
+	int height;
+	int length;
 
 	int roomIndex;
 
@@ -31,5 +34,6 @@ public:
 	~Room();
 
 	void make_corner(SharedPtr <Place> field, int cornerNum);
+	void calculate_sizes();
 };
 

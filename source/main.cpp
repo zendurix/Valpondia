@@ -193,7 +193,7 @@ bool MENU_handler_ret_startGame(MENU menu, bool* exit)
 		wait_for_input(space);
 		return false;
 	case dungStep:
-		make_dung_map_ret_rooms(true);
+		//make_dung_map_ret_rooms(true);
 		return false;
 	case gameSTART:
 		game->levels[game->levelActiveId]->changeLevelType(startLevel);

@@ -1,8 +1,6 @@
 #include "pch.h"
 #include "Node.h"
 
-int Node::level = 0;
-int Node::nodeCount = -1;
 
 Node::Node(int levelmax, SharedPtr<Place> fieldNode1, int length1, int height1, int orientation)
 {
@@ -23,11 +21,11 @@ Node::Node(int levelmax, SharedPtr<Place> fieldNode1, int length1, int height1, 
 		nodeIndex == 7  || nodeIndex == 15 ||
 		nodeIndex == 31 || nodeIndex == 63)
 	{
-		level++;
+		actualTreeLevel++;
 	}
-	levelIndex = level;
+	levelIndex = actualTreeLevel;
 
-	if (level == 0)
+	if (actualTreeLevel == 0)
 	{
 		isRoot = true;
 		parent = nullptr;
@@ -38,7 +36,7 @@ Node::Node(int levelmax, SharedPtr<Place> fieldNode1, int length1, int height1, 
 		isRoot = false;
 	}
 
-	if (level == levelmax)
+	if (actualTreeLevel == levelmax)
 	{
 		isLeaf = true;
 		childreen[0] = nullptr;
@@ -87,17 +85,16 @@ sf::String Node::make_family_list()
 	return str;
 }
 
-void make_children(std::unique_ptr<Node> &sister1, std::unique_ptr<Node> &sister2,
-				   std::unique_ptr<Node> &parent1)
+void Node::make_children(std::unique_ptr<Node> &child1, std::unique_ptr<Node> &child2)
 {
-	sister1->sister = sister2.get();
-	sister2->sister = sister1.get();
+	child1->sister = child2.get();
+	child2->sister = child1.get();
 
-	sister1->parent = parent1.get();
-	sister2->parent = parent1.get();
+	child1->parent = this;
+	child2->parent = this;
 
-	parent1->childreen[0] = sister1.get();
-	parent1->childreen[1] = sister2.get();
+	childreen[0] = child1.get();
+	childreen[1] = child2.get();
 }
 
 

@@ -10,9 +10,11 @@ class Room;
 
 class Node
 {
+private:
+
 public:
-	static int level;
-	static int nodeCount;
+	inline static int actualTreeLevel = 0;
+	inline static int nodeCount = -1;
 	int nodeIndex;
 	int levelIndex;
 
@@ -42,8 +44,18 @@ public:
 	void give_room_number();
 	sf::String make_family_list();
 
+
+	void make_children(std::unique_ptr<Node> &child1, std::unique_ptr<Node> &child2);
+
+
+
+	// getters
+	static int get_actualTreeLevel() { return actualTreeLevel; }
+	bool get_isLeaf() const			 { return isLeaf; }
+
+
+	// setters
+	static void set_actualTreeLevel(int set) { actualTreeLevel = set; }
 };
 
 
-void make_children(std::unique_ptr<Node> &sister1, std::unique_ptr<Node> &sister2,
-				   std::unique_ptr<Node> &parent1);

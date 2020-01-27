@@ -15,32 +15,37 @@
 	// connections will be: 3=4, 5=6, and randomly (3 || 4)=(5 || 6), so all branchess will be connected
 */
 
-#include "GAME.h"
+#include "general_purpose_func.h"
 #include "Node.h"
 #include "Room.h"
 
 class Place;
 class Room;
 class Node;
-class GAME;
 
 class BspMapGen
 {
 private:
-	GAME* game;
-	int nodesNum;
-	std::unique_ptr<Node> root_node;
-	bool testing;
-	std::vector<std::unique_ptr<Node>> nodes;
+	int treeHeight;
+	Vector2D<SharedPtr<Place>> &fieldRef;
+	std::vector<UniquePtr<Node>> nodes;
 
-	BspMapGen(bool test);
+	BspMapGen(Vector2D<SharedPtr<Place>> &field, int height);
 	~BspMapGen();
+	void RESET_NodeClass();
+	void RESET_field();
+	void color_map_white();
 
-	void make_full_tree();
 
-	bool split_dungeon_BSP(SharedPtr<Place>  field, std::unique_ptr<Node> &parent, int level);
+
+	void split_map();
+
+	bool split_node(SharedPtr<Place> parentField, std::unique_ptr<Node> &parent, int level); //ret false if error
+	void split_horizontal(std::unique_ptr<Node> &parent, int& y, int& length1, int& length2, int& height1, int& height2);
+	void split_vertical(std::unique_ptr<Node> &parent, int& x, int& length1, int& length2, int& height1, int& height2);
 
 	void fill_leaves_with_rooms(std::vector <SharedPtr <Room>> *rooms);
+	SharedPtr<Room> make_random_room_in_node(int nodeIndex);
 
 	void connect_all_rooms();
 
@@ -48,8 +53,15 @@ private:
 
 	void chceck_sizes(int levelmax, int MIN_SIZE);
 
+	
+
 public:
-	static std::vector<SharedPtr<Room>> make_dung_map_ret_rooms(Vector2D<SharedPtr<Place>> &field, bool test);
+
+	static std::vector<SharedPtr<Room>> make_dung_map_ret_rooms(Vector2D<SharedPtr<Place>> &field, int treeHeight);
+
+
+
+
 
 
 };

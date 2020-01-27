@@ -1,337 +1,326 @@
 #include "pch.h"
 #include "BspMapGen.h"
 
-std::vector<SharedPtr<Room>> BspMapGen::make_dung_map_ret_rooms(Vector2D<SharedPtr<Place>> &field, bool test)
+// 370 linijek
+
+std::vector<SharedPtr<Room>> BspMapGen::make_dung_map_ret_rooms(Vector2D<SharedPtr<Place>> &fieldRef, int treeHeight)
 {
-	GAME* game = GAME::getInstance();
-	std::vector <SharedPtr <Room>> rooms;
-
-	BspMapGen tree(test);
-
-	int restart_count = 0;
+	BspMapGen tree(fieldRef, treeHeight);
+	std::vector<SharedPtr<Room>> rooms;
+	
+	int restartCount = 0;
 	bool restart = false;
 	while (!restart)
 	{
 		try
 		{
-			tree.make_full_tree();
+			tree.split_map();
 			restart = true;
 		}
 		catch (...)
 		{
 			restart = false;
-			restart_count++;
-			for (int i = 0; i < MYHEIGHT; i++)
-				for (int j = 0; j < MYLENGTH; j++)
-					game->levelActive->field[i][j]->RESET();
+			restartCount++;
+			tree.RESET_field();
 		}
 	}
+	LOG("BSP tree restart count: " << restartCount);
 
-	LOG("BSP tree restart count: " << restart_count);
-
+	make_whole_map_obstacle();
 	tree.fill_leaves_with_rooms(&rooms);
 	tree.connect_all_rooms();
 
-	if (test)
-	{
-		for (int i = 0; i < MYHEIGHT; i++)
-			for (int j = 0; j < MYLENGTH; j++)
-				game->levelActive->field[i][j]->set_tileColor(sf::Color::White);
-	}
-	tree.~tree();
+	#include "GAME.h"
+	GAME::getInstance()->Printer->print_field();
+
 	return rooms;
 }
 
 
 
-BspMapGen::BspMapGen(bool test)
+BspMapGen::BspMapGen(Vector2D<SharedPtr<Place>> &field, int height)
+	: fieldRef(field), treeHeight(height)
 {
-	// to actually make a full tree call make_full_tree method
-	// this was split into other method, due to restarting problem
-	testing = test;
 }
 
 BspMapGen::~BspMapGen()
 {
-	root_node = nullptr;
+	RESET_NodeClass();
+}
+
+void BspMapGen::RESET_NodeClass()
+{
 	nodes.clear();
 	Node::nodeCount = -1;
-	Node::level = 0;
+	Node::set_actualTreeLevel(0);
 }
 
-
-void BspMapGen::make_full_tree()
+void BspMapGen::RESET_field()
 {
-	game = GAME::getInstance();
-	std::vector <std::vector <SharedPtr<Place> > > &field = game->levelActive->field;
-	int actual_level;
-	nodesNum = 0;
-	for (int i = 0; i <= MAX_LEVEL; i++)
+	for (int i = 0; i < MYHEIGHT; i++)
+		for (int j = 0; j < MYLENGTH; j++)
+			fieldRef[i][j]->RESET();
+}
+
+void BspMapGen::color_map_white()
+{ // used in testing
+	for (int i = 0; i < MYHEIGHT; i++)
+		for (int j = 0; j < MYLENGTH; j++)
+			fieldRef[i][j]->set_tileColor(sf::Color::White);
+}
+
+
+void BspMapGen::split_map()
+{
+	int actualLevel;
+
+	UniquePtr<Node> rootNode = std::make_unique<Node>(treeHeight, fieldRef[0][0], MYLENGTH, MYHEIGHT, 0);
+	nodes.push_back(std::move(rootNode));
+
+	for (int i = 0; i < treeHeight; i++)
 	{
-		nodesNum += (int)pow(2, i);
-	}
+		actualLevel = Node::get_actualTreeLevel();
 
-	root_node = std::make_unique<Node>(MAX_LEVEL, field[0][0], MYLENGTH, MYHEIGHT, 0);
-	nodes.push_back(std::move(root_node));
+		int startingNodeId = (int)pow(2, actualLevel) - 1;
+		int endingNodeId = (int)pow(2, actualLevel + 1) - 2;
 
-	for (int i = 0; i < MAX_LEVEL; i++)
-	{
-		actual_level = root_node->level;
-
-		for (int j = (int)pow(2, actual_level) - 1; j <= (int)pow(2, actual_level + 1) - 2; j++)
+		for (int j = startingNodeId; j <= endingNodeId; j++)
 		{
-			if (!split_dungeon_BSP(nodes[j]->fieldNode, nodes[j], actual_level))
+			bool splitSuccesful = split_node(nodes[j]->fieldNode, nodes[j], actualLevel);
+			if (!splitSuccesful)
 			{ // RNG failed (loops over 200 times)
-				Node::level = 0;
-				Node::nodeCount = -1;
-				root_node = nullptr;
-				nodes.clear();
-				throw "false";
+				RESET_NodeClass();
+				throw "ERROR"; 
 			}
-		}
-	}
-
-	if(testing) // print split steps, and room connection steps
-	{
-		for (int k = 0; k <= MAX_LEVEL; k++)
-		{
-			for (int i = 0; i < MYHEIGHT; i++)
-				for (int j = 0; j < MYLENGTH; j++)
-					field[i][j]->set_tileColor(sf::Color::White);
-
-			for (std::unique_ptr<Node> &node : nodes)
-			{
-				if (node->levelIndex == k)
-				{
-					for (int i = node->fieldNode->get_x(); i < node->fieldNode->get_x() + node->length; i++)
-					{
-						field[node->fieldNode->get_y()][i]->set_tileColor(sf::Color::Red);
-						field[node->fieldNode->get_y() + node->height - 1][i]->set_tileColor(sf::Color::Red);
-					}
-					for (int i = node->fieldNode->get_y(); i < node->fieldNode->get_y() + node->height; i++)
-					{
-						field[i][node->fieldNode->get_x()]->set_tileColor(sf::Color::Red);
-						field[i][node->fieldNode->get_x() + node->length - 1]->set_tileColor(sf::Color::Red);
-					}
-				}
-			}
-			game->Printer->print_field_BSP_show(false, nodes);
-			wait_for_input(space);
 		}
 	}
 }
 
 
-bool BspMapGen::split_dungeon_BSP(SharedPtr<Place> field, std::unique_ptr<Node> &parent, int level)
-{ // field is parent->field-node   // returns false, when error
-	std::unique_ptr<Node> node1, node2;
-	bool orientation = random(0, 1);
+
+
+
+
+
+bool BspMapGen::split_node(SharedPtr<Place> parentField, std::unique_ptr<Node> &parent, int level)
+{ 
+	UniquePtr<Node> nodeChild1, nodeChild2;
+	bool vertical = random(0, 1);
 	int length1, length2, height1, height2;
 	int x, y;
-	int error = 0;
+	int errorCount = 0;
 
-	if (orientation == 0) // horizontal
+
+	if (vertical)  // vertical
 	{
 		do
 		{
-			y = random(parent->fieldNode->get_y() + parent->height / 2 - MIN_SIZE / 2,
-				parent->fieldNode->get_y() + parent->height / 2 + MIN_SIZE / 2);
-			length1 = parent->length;
-			length2 = length1;
-			height1 = y - parent->fieldNode->get_y();
-			height2 = parent->height - height1;
-			error++;
-			if (error > 200)
-			{
+			split_vertical(parent, x, length1, length2, height1, height2);
+			errorCount++;
+			if (errorCount > 200)
 				return false;
-			}
 
-		} while (height1 < MIN_SIZE + 1 || height2 < MIN_SIZE + 1);
+		} while (length1 < MIN_ROOM_SIZE + PLACE_FOR_WALLS || length2 < MIN_ROOM_SIZE + PLACE_FOR_WALLS);
 	}
-	else if (orientation == 1)  // vertical
+	else // (!vertical) -> horizontal
 	{
 		do
 		{
-			x = random(parent->fieldNode->get_x() + parent->length / 2 - MIN_SIZE / 2,
-				parent->fieldNode->get_x() + parent->length / 2 - MIN_SIZE / 2);
-			length1 = x - parent->fieldNode->get_x();
-			length2 = parent->length - length1;
-			height1 = parent->height;
-			height2 = parent->height;
-			error++;
-			if (error > 200)
-			{
+			split_horizontal(parent, x, length1, length2, height1, height2);
+			errorCount++;
+			if (errorCount > 200)
 				return false;
-			}
-
-		} while (length1 < MIN_SIZE + 1 || length2 < MIN_SIZE + 1);
+		} while (height1 < MIN_ROOM_SIZE + PLACE_FOR_WALLS || height2 < MIN_ROOM_SIZE + PLACE_FOR_WALLS);
 	}
 
-	node1 = std::make_unique<Node>(MAX_LEVEL, field, length1, height1, orientation);
+	nodeChild1 = std::make_unique<Node>(treeHeight, parentField, length1, height1, vertical);
 
-	int fieldX = field->get_x();
-	int fieldY = field->get_y();
+	int fieldX = parentField->get_x();
+	int fieldY = parentField->get_y();
+	
+	if (vertical)	fieldX += length1;
+	else 			fieldY += height1;
 
-	if (orientation == 0)
-	{
-		fieldY += height1;
-	}
-	else
-	{
-		fieldX += length1;
-	}
+	parentField = fieldRef[fieldY][fieldX];
 
-	field = game->levelActive->field[fieldY][fieldX];
+	nodeChild2 = std::make_unique<Node>(treeHeight, parentField, length2, height2, vertical);
 
-	node2 = std::make_unique<Node>(MAX_LEVEL, field, length2, height2, orientation);
-
-	make_children(node1, node2, parent);
-	nodes.push_back(std::move(node1));
-	nodes.push_back(std::move(node2));
+	parent->make_children(nodeChild1, nodeChild2);
+	nodes.push_back(std::move(nodeChild1));
+	nodes.push_back(std::move(nodeChild2));
 	return true;
 }
 
+void BspMapGen::split_horizontal(std::unique_ptr<Node> &parent, int& y, int& length1, int& length2, int& height1, int& height2)
+{
+	int minY = parent->fieldNode->get_y() + parent->height / 2 - MIN_ROOM_SIZE / 2;
+	int maxY = parent->fieldNode->get_y() + parent->height / 2 + MIN_ROOM_SIZE / 2;
+	y = random(minY, maxY);
+	length1 = parent->length;
+	length2 = length1;
+	height1 = y - parent->fieldNode->get_y();
+	height2 = parent->height - height1;
+}
+
+void BspMapGen::split_vertical(std::unique_ptr<Node> &parent, int& x, int& length1, int& length2, int& height1, int& height2)
+{
+	int minX = parent->fieldNode->get_x() + parent->length / 2 - MIN_ROOM_SIZE / 2;
+	int maxX = parent->fieldNode->get_x() + parent->length / 2 - MIN_ROOM_SIZE / 2;
+	x = random(minX, maxX);
+	length1 = x - parent->fieldNode->get_x();
+	length2 = parent->length - length1;
+	height1 = parent->height;
+	height2 = parent->height;
+}
+
+
+
+
+
+
+
+
+
+
 void BspMapGen::fill_leaves_with_rooms(std::vector <SharedPtr <Room>> *rooms)
 {
-	make_whole_map_obstacle();
-	int length1, height1;
-	int x1, y1;
-	SharedPtr <Room> room;
-	for (int i = 0; i < nodesNum; i++)
+	SharedPtr<Room> room;
+	int nodesSize = nodes.size();
+
+	for (int i = 0; i < nodesSize; i++)
 	{
-		if (nodes[i]->isLeaf)
+		if (nodes[i]->get_isLeaf())
 		{
-			do
-			{
-				length1 = random(MIN_SIZE - 2, nodes[i]->length - 3);
-				height1 = random(MIN_SIZE - 2, nodes[i]->height - 3);
-			} while ((double)height1 / length1 < ROOM_WALLS_PROPORTION ||
-					 (double)length1 / height1 < ROOM_WALLS_PROPORTION  );
-
-			if (nodes[i]->fieldNode->get_x() + 2 < (nodes[i]->fieldNode->get_x() + nodes[i]->length) - (length1 + 2))
-				x1 = random(nodes[i]->fieldNode->get_x() + 1, (nodes[i]->fieldNode->get_x() + nodes[i]->length) - (length1 + 2));
-			else
-				x1 = nodes[i]->fieldNode->get_x() + 1;
-
-
-			if (nodes[i]->fieldNode->get_y() + 2 < (nodes[i]->fieldNode->get_y() + nodes[i]->height) - (height1 + 2))
-				y1 = random(nodes[i]->fieldNode->get_y() + 1, (nodes[i]->fieldNode->get_y() + nodes[i]->height) - (height1 + 2));
-			else
-				y1 = nodes[i]->fieldNode->get_y() + 1;
-
-
-			if (y1 + height1 + 1 >= MYHEIGHT- 1)
-				height1--;
-			if (x1 + length1 + 1 >= MYLENGTH - 1)
-				length1--;
-
-			
-			room = std::make_shared<Room>();
-
-			make_room("rectangle", x1, y1, length1, height1, room, "", false);
-
-			nodes[i]->room = room;
+			room = make_random_room_in_node(i);
 			rooms->push_back(room);
 		}
 	}
-	for (int i = 0; i < nodesNum; i++)
+	for (int i = 0; i < nodesSize; i++)
 	{
 		if (nodes[i]->isLeaf)
-		{
 			nodes[i]->check_family();
-		}
-	}
-	if (testing)
-	{
-		game->Printer->print_field_BSP_show(true, nodes);
-		wait_for_input(space);
 	}
 
 }
 
+SharedPtr<Room> BspMapGen::make_random_room_in_node(int nodeIndex)
+{
+	int length, height;
+	int x, y;
+	SharedPtr <Room> room;
+
+	int maxLength = nodes[nodeIndex]->length - PLACE_FOR_WALLS;
+	int maxHeight = nodes[nodeIndex]->height - PLACE_FOR_WALLS;
+
+	do
+	{
+		length = random(MIN_ROOM_SIZE, maxLength);
+		height = random(MIN_ROOM_SIZE, maxHeight);
+	} while ((double)height / length < ROOM_WALLS_PROPORTION ||	(double)length / height < ROOM_WALLS_PROPORTION);
+	
+	int parentX = nodes[nodeIndex]->fieldNode->get_x();
+	int parentY = nodes[nodeIndex]->fieldNode->get_y();
+
+	int maxX = (parentX + nodes[nodeIndex]->length) - (length + PLACE_FOR_WALLS);
+	int maxY = (parentY + nodes[nodeIndex]->height) - (height + PLACE_FOR_WALLS);
+
+	if (parentX + PLACE_FOR_WALLS < maxX)	x = random(parentX, maxX);
+	else									x = parentX;
+
+	if (parentY + PLACE_FOR_WALLS < maxY)	y = random(parentY, maxY);
+	else									y = parentY;
+
+	room = std::make_shared<Room>();
+	make_room("rectangle", x, y, length, height, room);
+	nodes[nodeIndex]->room = room;
+	return room;
+}
+
+
+
+
 void BspMapGen::connect_all_rooms()
 {
-	std::vector <std::vector <SharedPtr<Place> > > &field = game->levelActive->field;
 	SharedPtr<Place> searcher1 = nullptr, searcher2 = nullptr;
 	Node* node1 = nullptr, *node2 = nullptr;
 	bool horizontalConnection;
-	bool found = false;
-	bool child;	
-	int add_connections = 3, counter = 0; // to add more connections on first level of the tree
+	bool foundRoute = false;
+	int childSelect;	
+	int addConnections = 3, aditionalConnectionsCounter = 0; // to add more connections on first level of the tree
 
-	for (int j = MAX_LEVEL; j > 0; j--)
+	for (int treeLevel = treeHeight; treeLevel > 0; treeLevel--)
 	{
-		for (int i = (int)pow(2, j) - 1; i < (int)pow(2, j + 1) - 2;
-			i += (j != 1) ? 2 : ((counter < add_connections) ? 0 : 2))
+		int startNodeIndex = (int)pow(2, treeLevel) - 1;
+		int maxNodeIndex = (int)pow(2, treeLevel + 1) - 2;
+		auto iAdder = [&]() { return (treeLevel != 1) ? 2 : ((aditionalConnectionsCounter < addConnections) ? 0 : 2); };
+
+		for (int i = startNodeIndex; i < maxNodeIndex;	i += iAdder())
 		{
-			counter += (j == 1) ? 1 : 0;
-			found = false;
-			while (!found)
+			aditionalConnectionsCounter += (treeLevel == 1) ? 1 : 0;
+			foundRoute = false;	
+			while (!foundRoute)
 			{
 				node1 = nodes[i].get();
 				node2 = nodes[i + 1].get();
 				while (node1->childreen[0] != nullptr)
 				{
-					child = random(0, 1);
-					node1 = node1->childreen[child];
-					node2 = node2->childreen[child];
+					childSelect = random(0, 1);
+					node1 = node1->childreen[childSelect];
+					node2 = node2->childreen[childSelect];
 				}
 
 				if (nodes[i]->horizontal)
 				{
 					if (node2->room->cornerNW.x >= node1->room->cornerNE.x)
-						found = true;
+						foundRoute = true;
 				}
 				else  // vertical
 				{
 					if (node2->room->cornerNE.y >= node1->room->cornerSE.y)
-						found = true;
+						foundRoute = true;
 				}
 			}
 
 			horizontalConnection = (node2->room->cornerNE.y - node1->room->cornerSE.y >=
 				node2->room->cornerNW.x - node1->room->cornerNE.x) ? 0 : 1;
 
+			int doorPosY1 = random(node1->room->cornerNE.y + 2, node1->room->cornerNE.y + 2 + (node1->room->height - 2));
+			int doorPosY2 = random(node2->room->cornerNE.y + 2, node2->room->cornerNE.y + 2 + (node2->room->height - 2));
+			int doorPosX1 = random(node1->room->cornerSW.x + 2, node1->room->cornerSW.x + 2 + (node1->room->length - 2));
+			int doorPosX2 = random(node2->room->cornerNW.x + 2, node2->room->cornerNW.x + 2 + (node2->room->length - 2));
 
 			if (horizontalConnection) //(nodes[i]->horizontal)
 			{
-				searcher1 = field[node1->room->cornerNE.cornerPtr->get_y() + 2][node1->room->cornerNE.cornerPtr->get_x()];
-				searcher2 = field[node2->room->cornerNW.cornerPtr->get_y() + 2] [node2->room->cornerNW.cornerPtr->get_x()];
+				searcher1 = fieldRef[doorPosY1][node1->room->cornerNE.x];
+				searcher2 = fieldRef[doorPosY2][node2->room->cornerNW.x];
 			}													  
 			else // vertical									  
 			{													  
-				searcher1 = field[node1->room->cornerSW.cornerPtr->get_y()][node1->room->cornerSW.cornerPtr->get_x() + 2];
-				searcher2 = field[node2->room->cornerNW.cornerPtr->get_y()][node2->room->cornerNW.cornerPtr->get_x() + 2];
+				searcher1 = fieldRef[node1->room->cornerSW.y][doorPosX1];
+				searcher2 = fieldRef[node2->room->cornerNW.y][doorPosX2];
 			}
 
-			connect_2_rooms(searcher1, searcher2); // node1->horizontal);
-		}
-		if (testing)
-		{
-			game->Printer->print_field_BSP_show(true, nodes);
-			wait_for_input(space);
+			connect_2_rooms(searcher1, searcher2); 
 		}
 	}
 }
 
 void BspMapGen::connect_2_rooms(SharedPtr<Place> searcher1, SharedPtr<Place>  searcher2)
 {
-	std::vector <std::vector <SharedPtr<Place> > > &field = game->levelActive->field;
-
 	searcher1->unmake_obstacle();
-	static SharedPtr<Place>  bestDir = searcher1;
-	static SharedPtr<Place>  searcher1START = searcher1;
-	static SharedPtr<Place>  placeHolder = nullptr;
-	int error_counter = 0;
+	SharedPtr<Place> bestDir = searcher1;
+	SharedPtr<Place> searcher1START = searcher1;
+	SharedPtr<Place> placeHolder = nullptr;
+	int errorCounter = 0;
 	double bestDist;
 	bool bestFound = false;
 	bool ignoreIsWall = false;
 
 	//if searcher is on edge of map place it on different corner of room
 	if (searcher1->get_x() == 0 || searcher1->get_y() == 0)
-		searcher1 = field[searcher1->get_roomHere()->cornerSE.y][searcher1->get_roomHere()->cornerSE.x - 1];
+		searcher1 = fieldRef[searcher1->get_roomHere()->cornerSE.y][searcher1->get_roomHere()->cornerSE.x - 1];
 	if (searcher1->get_x() == MYLENGTH - 1 || searcher1->get_y() == MYHEIGHT - 1)
-		searcher1 = field[searcher1->get_roomHere()->cornerNW.y][searcher1->get_roomHere()->cornerNW.x + 1];
+		searcher1 = fieldRef[searcher1->get_roomHere()->cornerNW.y][searcher1->get_roomHere()->cornerNW.x + 1];
 
 	searcher1->unmake_obstacle();
 	
@@ -350,23 +339,19 @@ void BspMapGen::connect_2_rooms(SharedPtr<Place> searcher1, SharedPtr<Place>  se
 			placeHolder = searcher1;
 			switch (i)
 			{
-				case 1:	if CHECKbth searcher1 = field[searcher1->get_y() + 1][searcher1->get_x() - 1];	break;
-				case 2:	if CHECKmax searcher1 = field[searcher1->get_y() + 1][searcher1->get_x()];		break;
-				case 3:	if CHECKmax searcher1 = field[searcher1->get_y() + 1][searcher1->get_x() + 1];	break;
-				case 4:	if CHECKmin searcher1 = field[searcher1->get_y()]    [searcher1->get_x() - 1];	break;
-				case 5:	continue;																	break;
-				case 6:	if CHECKmax searcher1 = field[searcher1->get_y()]    [searcher1->get_x() + 1];	break;
-				case 7:	if CHECKmin searcher1 = field[searcher1->get_y() - 1][searcher1->get_x() - 1];	break;
-				case 8:	if CHECKmin searcher1 = field[searcher1->get_y() - 1][searcher1->get_x()];		break;
-				case 9:	if CHECKbth searcher1 = field[searcher1->get_y() - 1][searcher1->get_x() + 1];	break;
+				case 1:	if CHECKbth searcher1 = fieldRef[searcher1->get_y() + 1][searcher1->get_x() - 1];	break;
+				case 2:	if CHECKmax searcher1 = fieldRef[searcher1->get_y() + 1][searcher1->get_x()    ];	break;
+				case 3:	if CHECKmax searcher1 = fieldRef[searcher1->get_y() + 1][searcher1->get_x() + 1];	break;
+				case 4:	if CHECKmin searcher1 = fieldRef[searcher1->get_y()    ][searcher1->get_x() - 1];	break;
+				case 5:	continue;																			break;
+				case 6:	if CHECKmax searcher1 = fieldRef[searcher1->get_y()    ][searcher1->get_x() + 1];	break;
+				case 7:	if CHECKmin searcher1 = fieldRef[searcher1->get_y() - 1][searcher1->get_x() - 1];	break;
+				case 8:	if CHECKmin searcher1 = fieldRef[searcher1->get_y() - 1][searcher1->get_x()    ];	break;
+				case 9:	if CHECKbth searcher1 = fieldRef[searcher1->get_y() - 1][searcher1->get_x() + 1];	break;
 			}
 
 			if (ignoreIsWall || !searcher1->get_isWall() || searcher1 == searcher2)   
 			{
-				if (searcher1 == searcher2)
-				{
-					int aaa = 3;
-				}
 				if (distance_meter(*searcher1, *searcher2) < bestDist)
 				{
 					int bbb = 4;
@@ -377,11 +362,11 @@ void BspMapGen::connect_2_rooms(SharedPtr<Place> searcher1, SharedPtr<Place>  se
 			searcher1 = placeHolder;
 		}
 		searcher1 = bestDir;
-		error_counter++;
-		if (error_counter > 100)
+		errorCounter++;
+		if (errorCounter > 100) // if can't connect for too long it can go trough walls
 		{
 			ignoreIsWall = true;
-			error_counter = 0;
+			errorCounter = 0;
 		}
 		searcher1->unmake_obstacle();
 	}

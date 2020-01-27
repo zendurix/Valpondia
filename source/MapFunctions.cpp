@@ -51,8 +51,7 @@ std::vector<SharedPtr<Room>> make_dung_map_ret_rooms(bool test)
 */
 
 
-void make_room(std::string shape_name, int x, int y, int length1,
-	int length2, SharedPtr <Room> room, std::string orientation, bool bspRoom)
+void make_room(std::string shape_name, int x, int y, int length1, int length2, SharedPtr <Room> room)
 {
 	int startX = x,
 		startY = y;
@@ -64,10 +63,8 @@ void make_room(std::string shape_name, int x, int y, int length1,
 		SharedPtr <Room> room1 = std::make_shared <Room>();
 		room = room1;
 	}
-
-
-	
-	
+	   
+	/*
 	if (shape_name == "line")
 	{
 		for (int i = 0; i < length1; i++)
@@ -79,105 +76,100 @@ void make_room(std::string shape_name, int x, int y, int length1,
 				y++;
 		}
 	}
+	*/
 
-
-	// THIS is main room making option
-	else if (shape_name == "rectangle")
+	// upper wall
+	for (int i = 0; i < length1; i++)
 	{
-		y--;
-		x--;
-
-		// upper wall
-		for (int i = 0; i < length1 + 2; i++)
+		field[y][x]->make_wall();
+		field[y][x]->set_printFormat(196);
+		field[y][x]->set_prevPrintFormat(196);
+		room->walls.push_back(field[y][x]);
+		if (i == 0)
 		{
-			field[y][x]->make_wall();
-			field[y][x]->set_printFormat(196);
-			field[y][x]->set_prevPrintFormat(196);
-			room->walls.push_back(field[y][x]);
-			if (i == 0)
-			{
-				field[y][x]->set_printFormat(218);
-				field[y][x]->set_prevPrintFormat(218);
-				room->make_corner(field[y][x], 1);
-			}
-			if (i == length1 + 1)
-			{
-				field[y][x]->set_printFormat(191);
-				field[y][x]->set_prevPrintFormat(191);
-				room->make_corner(field[y][x], 2);
-			}
-			field[y][x]->set_roomHere(room);
-			x++;
+			field[y][x]->set_printFormat(218);
+			field[y][x]->set_prevPrintFormat(218);
+			room->make_corner(field[y][x], 1);
 		}
-		y = startY + length2;
-		x = startX - 1;	
-
-		// down wall
-		for (int i = 0; i < length1 + 2; i++)
+		if (i == length1 - 1)
 		{
-			field[y][x]->make_wall();
-			field[y][x]->set_printFormat(196);
-			field[y][x]->set_prevPrintFormat(196);
-			room->walls.push_back(field[y][x]);
-			if (i == 0)
-			{
-				field[y][x]->set_printFormat(192);
-				field[y][x]->set_prevPrintFormat(192);
-				room->make_corner(field[y][x], 3);
-			}
-			if (i == length1 + 1)
-			{
-				field[y][x]->set_printFormat(217);
-				field[y][x]->set_prevPrintFormat(217);
-				room->make_corner(field[y][x], 4);
-			}
-			field[y][x]->set_roomHere(room);
-			x++;
+			field[y][x]->set_printFormat(191);
+			field[y][x]->set_prevPrintFormat(191);
+			room->make_corner(field[y][x], 2);
 		}
-		x = startX - 1;
-		y = startY;
-
-		// left wall
-		for (int i = 0; i < length2; i++)
-		{
-			field[y][x]->make_wall();
-			field[y][x]->set_printFormat(179);
-			field[y][x]->set_prevPrintFormat(179);
-			room->walls.push_back(field[y][x]);
-			field[y][x]->set_roomHere(room);
-			y++;
-		}
-		x = startX + length1;
-		y = startY;
-
-		//right wall
-		for (int i = 0; i < length2; i++)
-		{
-			field[y][x]->make_wall();
-			field[y][x]->set_printFormat(179);
-			field[y][x]->set_prevPrintFormat(179);
-			room->walls.push_back(field[y][x]);
-			field[y][x]->set_roomHere(room);
-			y++;
-		}
-		x = startX;
-		y = startY;
-
-		// MAKE ROOM INSIDE
-		for (int i = 0; i < length2; i++)
-		{
-			for (int j = 0; j < length1; j++)
-			{
-				field[y][x]->unmake_obstacle();
-				field[y][x]->set_isInRoom(true);
-				field[y][x]->set_roomHere(room);
-				x++;
-			}
-			x = startX;
-			y++;
-		}
-
+		field[y][x]->set_roomHere(room);
+		x++;
 	}
+	y = startY + length2;
+	x = startX;	
+
+	// down wall
+	for (int i = 0; i < length1; i++)
+	{
+		field[y][x]->make_wall();
+		field[y][x]->set_printFormat(196);
+		field[y][x]->set_prevPrintFormat(196);
+		room->walls.push_back(field[y][x]);
+		if (i == 0)
+		{
+			field[y][x]->set_printFormat(192);
+			field[y][x]->set_prevPrintFormat(192);
+			room->make_corner(field[y][x], 3);
+		}
+		if (i == length1 - 1)
+		{
+			field[y][x]->set_printFormat(217);
+			field[y][x]->set_prevPrintFormat(217);
+			room->make_corner(field[y][x], 4);
+		}
+		field[y][x]->set_roomHere(room);
+		x++;
+	}
+	x = startX;
+	y = startY;
+
+	// left wall
+	for (int i = 0; i < length2; i++)
+	{
+		field[y][x]->make_wall();
+		field[y][x]->set_printFormat(179);
+		field[y][x]->set_prevPrintFormat(179);
+		room->walls.push_back(field[y][x]);
+		field[y][x]->set_roomHere(room);
+		y++;
+	}
+	x = startX + length1;
+	y = startY;
+
+	//right wall
+	for (int i = 0; i < length2; i++)
+	{
+		field[y][x]->make_wall();
+		field[y][x]->set_printFormat(179);
+		field[y][x]->set_prevPrintFormat(179);
+		room->walls.push_back(field[y][x]);
+		field[y][x]->set_roomHere(room);
+		y++;
+	}
+	x = startX + 1;
+	y = startY + 1;
+
+	// MAKE ROOM INSIDE
+	for (int i = 0; i < length2; i++)
+	{
+		for (int j = 0; j < length1 - 1; j++)
+		{
+			field[y][x]->unmake_obstacle();
+			field[y][x]->set_isInRoom(true);
+			field[y][x]->set_roomHere(room);
+			x++;
+		}
+		x = startX + 1;
+		y++;
+	}
+	room->calculate_sizes();
+
+	
 }
 
 

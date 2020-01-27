@@ -39,3 +39,9 @@ void Room::make_corner(SharedPtr<Place> field, int cornerNum)
 		break;
 	}
 }
+
+void Room::calculate_sizes()
+{
+	height = cornerSE.y - cornerNE.y;
+	length = cornerNE.x - cornerNW.x;
+}
