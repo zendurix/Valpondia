@@ -102,7 +102,7 @@ void GAME_Printer::print_field_UPDATE()
 	g->windowHandle->display();
 }
 
-void GAME_Printer::setupTexture(sf::Sprite &sprite, std::shared_ptr<Place> place, bool test)
+void GAME_Printer::setupTexture(sf::Sprite &sprite, SharedPtr<Place> place, bool test)
 {
 	switch (place->get_printFormat())
 	{

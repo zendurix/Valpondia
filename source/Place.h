@@ -35,9 +35,9 @@ private:
 	     stairsUp;
 
 	Character* characterHere;
-	std::shared_ptr <Room> roomHere;
+	SharedPtr <Room> roomHere;
 
-	std::vector< std::shared_ptr<Item> > itemsHere;
+	std::vector< SharedPtr<Item> > itemsHere;
 
 	
 //private end
@@ -55,8 +55,8 @@ public:
 	void make_wall();
 	void make_visible();
 	void unmake_visible();
-	void drop_here(std::shared_ptr<Item> item);
-	void pick_up(std::shared_ptr<Item> item);
+	void drop_here(SharedPtr<Item> item);
+	void pick_up(SharedPtr<Item> item);
 	   	 
 
 	//getters:
@@ -76,10 +76,10 @@ public:
 	bool get_stairsUp()		{ return stairsUp; }
 	unsigned char get_printFormat()			 { return printFormat; }
 	unsigned char get_prevPrintFormat()		 { return prevPrintFormat; }
-	std::shared_ptr <Room> get_roomHere()	 { return roomHere; }
+	SharedPtr <Room> get_roomHere()	 { return roomHere; }
 	sf::Color get_tileColor()				 { return tileColor; }
 	Character* get_characterHere()			 { return characterHere; }
-	std::vector<std::shared_ptr<Item>>* get_itemsHere_ptr() { return &itemsHere; }
+	std::vector<SharedPtr<Item>>* get_itemsHere_ptr() { return &itemsHere; }
 
 	//setters
 	void set_isInRoom(bool set)				     { isInRoom = set; }
@@ -92,7 +92,7 @@ public:
 	void set_tileColor(sf::Color set)			 { tileColor = set; }
 	void set_printFormat(unsigned char set)		 { printFormat = set; }
 	void set_prevPrintFormat(unsigned char set)  { prevPrintFormat = set; }
-	void set_roomHere(std::shared_ptr<Room> set) { roomHere = set; }
+	void set_roomHere(SharedPtr<Room> set) { roomHere = set; }
 
 //public end
 

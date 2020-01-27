@@ -121,7 +121,7 @@ char GAME_charControler::player_turn()
 
 void GAME_charControler::place_character_randomly(Character* ch)
 {
-	std::shared_ptr<Place> place_here = g->levelActive->field[0][0];
+	SharedPtr<Place> place_here = g->levelActive->field[0][0];
 	do
 	{
 		place_here = g->levelActive->field[random(1, MYHEIGHT - 2)][random(1, MYLENGTH - 2)];
@@ -142,15 +142,15 @@ void GAME_charControler::pick_up_item(Character* ch)
 	g->reset_visibility(*g->player); // to avoid flickering tiles
 	g->Printer->print_field_UPDATE();
 
-	std::vector<std::shared_ptr<Item>> *items = ch->get_staysOn()->get_itemsHere_ptr();
+	std::vector<SharedPtr<Item>> *items = ch->get_staysOn()->get_itemsHere_ptr();
 	if (items->size() == 0)
 	{
 		LOG("NO ITEMS HERE"); // add in game message
 	}
 	else
 	{
-		std::vector<std::shared_ptr<Item>> picked = UI::pick_items_window(items);
-		for (std::shared_ptr<Item> item : picked)
+		std::vector<SharedPtr<Item>> picked = UI::pick_items_window(items);
+		for (SharedPtr<Item> item : picked)
 		{
 			ch->pick_item(item);
 			ch->get_staysOn()->pick_up(item);

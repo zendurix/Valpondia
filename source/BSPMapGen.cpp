@@ -1,6 +1,48 @@
 #include "pch.h"
 #include "BspMapGen.h"
 
+std::vector<SharedPtr<Room>> BspMapGen::make_dung_map_ret_rooms(Vector2D<SharedPtr<Place>> &field, bool test)
+{
+	GAME* game = GAME::getInstance();
+	std::vector <SharedPtr <Room>> rooms;
+
+	BspMapGen tree(test);
+
+	int restart_count = 0;
+	bool restart = false;
+	while (!restart)
+	{
+		try
+		{
+			tree.make_full_tree();
+			restart = true;
+		}
+		catch (...)
+		{
+			restart = false;
+			restart_count++;
+			for (int i = 0; i < MYHEIGHT; i++)
+				for (int j = 0; j < MYLENGTH; j++)
+					game->levelActive->field[i][j]->RESET();
+		}
+	}
+
+	LOG("BSP tree restart count: " << restart_count);
+
+	tree.fill_leaves_with_rooms(&rooms);
+	tree.connect_all_rooms();
+
+	if (test)
+	{
+		for (int i = 0; i < MYHEIGHT; i++)
+			for (int j = 0; j < MYLENGTH; j++)
+				game->levelActive->field[i][j]->set_tileColor(sf::Color::White);
+	}
+	tree.~tree();
+	return rooms;
+}
+
+
 
 BspMapGen::BspMapGen(bool test)
 {
@@ -21,7 +63,7 @@ BspMapGen::~BspMapGen()
 void BspMapGen::make_full_tree()
 {
 	game = GAME::getInstance();
-	std::vector <std::vector <std::shared_ptr<Place> > > &field = game->levelActive->field;
+	std::vector <std::vector <SharedPtr<Place> > > &field = game->levelActive->field;
 	int actual_level;
 	nodesNum = 0;
 	for (int i = 0; i <= MAX_LEVEL; i++)
@@ -80,7 +122,7 @@ void BspMapGen::make_full_tree()
 }
 
 
-bool BspMapGen::split_dungeon_BSP(std::shared_ptr<Place> field, std::unique_ptr<Node> &parent, int level)
+bool BspMapGen::split_dungeon_BSP(SharedPtr<Place> field, std::unique_ptr<Node> &parent, int level)
 { // field is parent->field-node   // returns false, when error
 	std::unique_ptr<Node> node1, node2;
 	bool orientation = random(0, 1);
@@ -149,12 +191,12 @@ bool BspMapGen::split_dungeon_BSP(std::shared_ptr<Place> field, std::unique_ptr<
 	return true;
 }
 
-void BspMapGen::fill_leaves_with_rooms(std::vector <std::shared_ptr <Room>> *rooms)
+void BspMapGen::fill_leaves_with_rooms(std::vector <SharedPtr <Room>> *rooms)
 {
 	make_whole_map_obstacle();
 	int length1, height1;
 	int x1, y1;
-	std::shared_ptr <Room> room;
+	SharedPtr <Room> room;
 	for (int i = 0; i < nodesNum; i++)
 	{
 		if (nodes[i]->isLeaf)
@@ -209,8 +251,8 @@ void BspMapGen::fill_leaves_with_rooms(std::vector <std::shared_ptr <Room>> *roo
 
 void BspMapGen::connect_all_rooms()
 {
-	std::vector <std::vector <std::shared_ptr<Place> > > &field = game->levelActive->field;
-	std::shared_ptr<Place> searcher1 = nullptr, searcher2 = nullptr;
+	std::vector <std::vector <SharedPtr<Place> > > &field = game->levelActive->field;
+	SharedPtr<Place> searcher1 = nullptr, searcher2 = nullptr;
 	Node* node1 = nullptr, *node2 = nullptr;
 	bool horizontalConnection;
 	bool found = false;
@@ -272,14 +314,14 @@ void BspMapGen::connect_all_rooms()
 	}
 }
 
-void BspMapGen::connect_2_rooms(std::shared_ptr<Place> searcher1, std::shared_ptr<Place>  searcher2)
+void BspMapGen::connect_2_rooms(SharedPtr<Place> searcher1, SharedPtr<Place>  searcher2)
 {
-	std::vector <std::vector <std::shared_ptr<Place> > > &field = game->levelActive->field;
+	std::vector <std::vector <SharedPtr<Place> > > &field = game->levelActive->field;
 
 	searcher1->unmake_obstacle();
-	static std::shared_ptr<Place>  bestDir = searcher1;
-	static std::shared_ptr<Place>  searcher1START = searcher1;
-	static std::shared_ptr<Place>  placeHolder = nullptr;
+	static SharedPtr<Place>  bestDir = searcher1;
+	static SharedPtr<Place>  searcher1START = searcher1;
+	static SharedPtr<Place>  placeHolder = nullptr;
 	int error_counter = 0;
 	double bestDist;
 	bool bestFound = false;
@@ -347,7 +389,7 @@ void BspMapGen::connect_2_rooms(std::shared_ptr<Place> searcher1, std::shared_pt
 }
 
 
-void chceck_sizes(int levelmax, int MIN_SIZE)
+void BspMapGen::chceck_sizes(int levelmax, int MIN_SIZE)
 {
 	if (MYHEIGHT < (MIN_SIZE + 1) * pow(2, levelmax) &&
 		MYLENGTH < (MIN_SIZE + 1) * pow(2, levelmax))

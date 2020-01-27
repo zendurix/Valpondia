@@ -22,9 +22,9 @@ public:
 
 	std::vector <int> family;
 
-	std::shared_ptr<Place> fieldNode; // pointer to first element of node field
+	SharedPtr<Place> fieldNode; // pointer to first element of node field
 
-	std::shared_ptr <Room> room;
+	SharedPtr <Room> room;
 
 	int length;
 	int height;
@@ -35,7 +35,7 @@ public:
 	bool isLeaf; // node in last tree level (no childreen)
 
 
-	Node(int levelmax, std::shared_ptr<Place> fieldNode1, int length1, int height1, int orientation);
+	Node(int levelmax, SharedPtr<Place> fieldNode1, int length1, int height1, int orientation);
 	~Node();
 
 	void check_family();

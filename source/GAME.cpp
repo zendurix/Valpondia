@@ -74,7 +74,7 @@ void GAME::make_new_level(lvType levelType)
 
 void GAME::reset_visibility(Character character)
 {
-	//std::vector<std::shared_ptr<Place> > checkAgain;
+	//std::vector<SharedPtr<Place> > checkAgain;
 
 
 

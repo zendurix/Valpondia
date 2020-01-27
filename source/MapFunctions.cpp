@@ -2,15 +2,16 @@
 #include "MapFunctions.h"
 
 
-void make_cave_map(bool testing, std::vector<std::vector<std::shared_ptr<Place> >> &fieldArr)
+void make_cave_map(bool testing, std::vector<std::vector<SharedPtr<Place> >> &fieldArr)
 {
 	CA_cave_gen cave(testing, fieldArr);
 }
 
-std::vector<std::shared_ptr<Room>> make_dung_map_ret_rooms(bool test)
+/*
+std::vector<SharedPtr<Room>> make_dung_map_ret_rooms(bool test)
 {
 	GAME* game = GAME::getInstance();
-	std::vector <std::shared_ptr <Room>> rooms;
+	std::vector <SharedPtr <Room>> rooms;
 
 	BspMapGen tree(test);
 
@@ -47,20 +48,20 @@ std::vector<std::shared_ptr<Room>> make_dung_map_ret_rooms(bool test)
 	tree.~tree();
 	return rooms;
 }
-
+*/
 
 
 void make_room(std::string shape_name, int x, int y, int length1,
-	int length2, std::shared_ptr <Room> room, std::string orientation, bool bspRoom)
+	int length2, SharedPtr <Room> room, std::string orientation, bool bspRoom)
 {
 	int startX = x,
 		startY = y;
 	GAME* game = GAME::getInstance();
-	std::vector <std::vector <std::shared_ptr<Place> > > &field = game->levelActive->field;
+	std::vector <std::vector <SharedPtr<Place> > > &field = game->levelActive->field;
 
 	if (room == nullptr)
 	{
-		std::shared_ptr <Room> room1 = std::make_shared <Room>();
+		SharedPtr <Room> room1 = std::make_shared <Room>();
 		room = room1;
 	}
 
@@ -186,7 +187,7 @@ void make_whole_map_obstacle()
 	GAME* game = GAME::getInstance();
 	for (int i = 0; i < MYHEIGHT; i++)
 	{
-		for (std::shared_ptr<Place>  x : game->levelActive->field[i])
+		for (SharedPtr<Place>  x : game->levelActive->field[i])
 		{
 			x->make_obstacle();
 		}
@@ -199,7 +200,7 @@ void make_whole_map_not_obstacle()
 	GAME* game = GAME::getInstance();
 	for (int i = 0; i < MYHEIGHT; i++)
 	{
-		for (std::shared_ptr<Place> x : game->levelActive->field[i])
+		for (SharedPtr<Place> x : game->levelActive->field[i])
 		{
 			x->unmake_obstacle();
 		}

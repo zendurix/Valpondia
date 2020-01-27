@@ -10,7 +10,7 @@ class Place;
 class Character
 {
 protected:
-	std::vector<std::vector<std::shared_ptr<Place> >> *fieldArr;
+	std::vector<std::vector<SharedPtr<Place> >> *fieldArr;
 	int onLevelID;
 
 	sf::String name;
@@ -21,7 +21,7 @@ protected:
 		 isAlive;
 	short posX, posY;
 	char printFormat;
-	std::shared_ptr<Place>  staysOn;
+	SharedPtr<Place>  staysOn;
 
 	short hpMax,
 		  hpLeft,
@@ -32,9 +32,9 @@ protected:
 
 	float speed;
 	
-	std::shared_ptr<Item> equipped[BODY_PARTS_COUNT]; // ID==BodyPart : {head = 0, body, hands, legs, lHand, rHand, none};
+	SharedPtr<Item> equipped[BODY_PARTS_COUNT]; // ID==BodyPart : {head = 0, body, hands, legs, lHand, rHand, none};
 
-	std::vector< std::shared_ptr<Item>> inventory;
+	std::vector< SharedPtr<Item>> inventory;
 	
 public:
 	//Character() = default;
@@ -46,35 +46,35 @@ public:
 	void take_damage(int damage);
 	void virtual DIE();
 
-	void pick_item(std::shared_ptr<Item> item);
-	void drop_item(std::shared_ptr<Item> item);
+	void pick_item(SharedPtr<Item> item);
+	void drop_item(SharedPtr<Item> item);
 
-	void equip_item(std::shared_ptr<Item> item, BodyPart part);
-	void un_equip_item(std::shared_ptr<Item> item, BodyPart part);
+	void equip_item(SharedPtr<Item> item, BodyPart part);
+	void un_equip_item(SharedPtr<Item> item, BodyPart part);
 
 
 // getters:
 	bool get_isAI() { return isAI; }
 	short get_x() { return posX; }
 	short get_y() { return posY; }
-	std::shared_ptr<Place>  get_staysOn() { return staysOn; }
+	SharedPtr<Place>  get_staysOn() { return staysOn; }
 	char get_printFormat() { return printFormat; }
 	int get_view() { return view; }
 	int get_onLevelID() { return onLevelID; };
 	sf::Sprite get_spriteChar() { return spriteChar; }
 
-	std::vector< std::shared_ptr<Item>>* get_inventory_ref() { return &inventory; }
-	std::shared_ptr<Item>* get_equipped_ref() { return equipped; }
+	std::vector< SharedPtr<Item>>* get_inventory_ref() { return &inventory; }
+	SharedPtr<Item>* get_equipped_ref() { return equipped; }
 
 // setters:
 	void set_x(short set) { posX = set; }
 	void set_y(short set) { posY = set; }
-	void set_staysOn(std::shared_ptr<Place>  set) { staysOn = set; }
+	void set_staysOn(SharedPtr<Place>  set) { staysOn = set; }
 	void set_printFormat(char set) { printFormat = set; }
 	void set_onLevelID(int set) { onLevelID = set; }
 	sf::Sprite set_spriteChar(sf::Sprite set) { spriteChar = set; }
 
-	void set_fieldArr(std::vector<std::vector<std::shared_ptr<Place> >> *field) { fieldArr = field; }
+	void set_fieldArr(std::vector<std::vector<SharedPtr<Place> >> *field) { fieldArr = field; }
 };
 
 

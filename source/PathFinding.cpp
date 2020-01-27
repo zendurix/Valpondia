@@ -2,7 +2,7 @@
 #include "PathFinding.h"
 
 
-char PathFinding::calc_dir(std::shared_ptr<Place> origin, std::shared_ptr<Place> target)
+char PathFinding::calc_dir(SharedPtr<Place> origin, SharedPtr<Place> target)
 {
 	int x1 = origin->get_x();
 	int y1 = origin->get_y();
@@ -33,7 +33,7 @@ char PathFinding::calc_dir(std::shared_ptr<Place> origin, std::shared_ptr<Place>
 
 
 
-char PathFinding::best_dir(Character character, std::shared_ptr<Place> target)
+char PathFinding::best_dir(Character character, SharedPtr<Place> target)
 {	
 	std::pair<int, char> result = Astar_path_dir_dist(character.get_staysOn(), target);
 
@@ -47,7 +47,7 @@ char PathFinding::best_dir(Character character, std::shared_ptr<Place> target)
 
 
 
-std::pair<char, int> PathFinding::Astar_path_dir_dist(std::shared_ptr<Place> start, std::shared_ptr<Place> end)
+std::pair<char, int> PathFinding::Astar_path_dir_dist(SharedPtr<Place> start, SharedPtr<Place> end)
 {
 	auto calc_h = [&](AstarNode curr)
 	{ return std::max(abs(curr.placeX - end->get_x()), abs(curr.placeY - end->get_y())) + 
@@ -118,7 +118,7 @@ std::pair<char, int> PathFinding::Astar_path_dir_dist(std::shared_ptr<Place> sta
 		}
 	}
 
-	std::vector<std::shared_ptr<Place>> path = make_path(closedVec, end);
+	std::vector<SharedPtr<Place>> path = make_path(closedVec, end);
 	int distance = path.size() - 1;
 	char dir = calc_dir(start, path.at(path.size() - 2));
 
@@ -212,10 +212,10 @@ bool PathFinding::vect_contains_same_node_lower_f(std::vector<AstarNode> &vec, A
 
 
 
-std::vector<std::shared_ptr<Place>> PathFinding::make_path(std::vector<AstarNode> nodes, std::shared_ptr<Place> end)
+std::vector<SharedPtr<Place>> PathFinding::make_path(std::vector<AstarNode> nodes, SharedPtr<Place> end)
 {
 	std::vector<AstarNode> nodesPath;
-	std::vector<std::shared_ptr<Place>> path;
+	std::vector<SharedPtr<Place>> path;
 
 	path.push_back(end);
 	path.push_back(nodes[nodes.size() - 1].placePtr);

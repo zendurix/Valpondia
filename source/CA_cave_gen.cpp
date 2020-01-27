@@ -2,7 +2,7 @@
 #include "CA_cave_gen.h"
 
 
-CA_cave_gen::CA_cave_gen(bool testing, std::vector<std::vector<std::shared_ptr<Place> >> &fieldArr)
+CA_cave_gen::CA_cave_gen(bool testing, std::vector<std::vector<SharedPtr<Place> >> &fieldArr)
 {
 	GAME *game = GAME::getInstance();
 	for (int i = 0; i < MYHEIGHT; i++)
@@ -140,7 +140,7 @@ int CA_cave_gen::count_neighbours(int y, int x)
 	return count;
 }
 
-void CA_cave_gen::set_map(std::vector<std::vector<std::shared_ptr<Place> >> &fieldArr)
+void CA_cave_gen::set_map(std::vector<std::vector<SharedPtr<Place> >> &fieldArr)
 {
 	for (int i = 0; i < MYHEIGHT; i++)
 		for (int j = 0; j < MYLENGTH; j++)

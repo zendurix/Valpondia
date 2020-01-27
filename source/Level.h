@@ -19,18 +19,18 @@ private:
 	int depth;
 	int levelID;
 
-	std::shared_ptr<Place>  stairsUp;
-	std::shared_ptr<Place>  stairsDown;
-	std::shared_ptr<Place>  prevStairsDown;
-	std::vector <std::shared_ptr <Room>> rooms;
+	SharedPtr<Place>  stairsUp;
+	SharedPtr<Place>  stairsDown;
+	SharedPtr<Place>  prevStairsDown;
+	std::vector <SharedPtr <Room>> rooms;
 
 	void init_field();
 	void make_level();
 
 public:
-	std::vector <std::vector <std::shared_ptr<Place> > > field; //vector equivalent of  Place field[MYHEIGHT][MYLENGTH];
+	std::vector <std::vector <SharedPtr<Place> > > field; //vector equivalent of  Place field[MYHEIGHT][MYLENGTH];
 
-	Level(lvType p_levelType, int depthLevel, std::shared_ptr<Place>  stairsDown);
+	Level(lvType p_levelType, int depthLevel, SharedPtr<Place>  stairsDown);
 	~Level();
 
 	bool isPlaceForStairsUp();
@@ -41,8 +41,8 @@ public:
 
 // getters:
 	int getDepth();
-	std::shared_ptr<Place>  get_stairsDown();
-	std::shared_ptr<Place>  get_stairsUp();
+	SharedPtr<Place>  get_stairsDown();
+	SharedPtr<Place>  get_stairsUp();
 	static int getLevelCount();
 };
 

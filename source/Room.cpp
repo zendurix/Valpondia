@@ -13,7 +13,7 @@ Room::~Room()
 	walls.clear();
 }
 
-void Room::make_corner(std::shared_ptr<Place> field, int cornerNum)
+void Room::make_corner(SharedPtr<Place> field, int cornerNum)
 {
 	switch (cornerNum)
 	{

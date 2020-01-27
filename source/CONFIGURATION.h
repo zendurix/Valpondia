@@ -2,26 +2,10 @@
 
 #include "pch.h"
 
-#define TESTING 1
-#define PRINT_ALLOCATIONS 1
-#if TESTING == 1             //_DEBUG == 1
-	#define LOG(x) std::cout << x << std::endl;
-	// macro to track any new allocations  (LOG_NEW; must be used after every allocations with "new" keyword)
-	// not very useful anymore, since most raw ptrs are changed to smart ptrs
-	#if PRINT_ALLOCATIONS  
-		#define LOG_NEW {	\
-							std::cout<<__FILE__<<" "<<__LINE__<<" alloc numb: "<<NEW_ALLOCATIONS<<std::endl; \
-							NEW_ALLOCATIONS++; \
-						}
-	#else 
-		#define LOG_NEW
-	#endif 
-#else // replace macros with nothing (they won't be working)
-	#define LOG(x)
-	#define LOG_NEW
-#endif
-
-static int NEW_ALLOCATIONS = 0;
+template <typename T>
+using Vector2D = std::vector <std::vector<T>>;
+template <typename T>
+using SharedPtr = std::shared_ptr<T>;
 
 
 
@@ -73,3 +57,25 @@ static const float ACCURACY = 0.00625f;
 static const float DEGREE_STEP = 0.25f;
 //
 
+
+
+#define TESTING 1
+#define PRINT_ALLOCATIONS 1
+#if TESTING == 1             //_DEBUG == 1
+#define LOG(x) std::cout << x << std::endl;
+// macro to track any new allocations  (LOG_NEW; must be used after every allocations with "new" keyword)
+// not very useful anymore, since most raw ptrs are changed to smart ptrs
+#if PRINT_ALLOCATIONS  
+#define LOG_NEW {	\
+							std::cout<<__FILE__<<" "<<__LINE__<<" alloc numb: "<<NEW_ALLOCATIONS<<std::endl; \
+							NEW_ALLOCATIONS++; \
+						}
+#else 
+#define LOG_NEW
+#endif 
+#else // replace macros with nothing (they won't be working)
+#define LOG(x)
+#define LOG_NEW
+#endif
+
+static int NEW_ALLOCATIONS = 0;

@@ -7,7 +7,7 @@ class CharacterPlayer :	public Character
 {
 
 public:
-	CharacterPlayer(short x, short y, std::vector<std::vector<std::shared_ptr<Place> >> *field);
+	CharacterPlayer(short x, short y, std::vector<std::vector<SharedPtr<Place> >> *field);
 	~CharacterPlayer();
 };
 

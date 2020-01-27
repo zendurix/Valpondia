@@ -9,9 +9,9 @@ void Character::loadTexture(sf::Sprite sprite)
 
 void Character::move(char direction)
 {
-	std::shared_ptr<Place>  field;
+	SharedPtr<Place>  field;
 	short prevX = posX, prevY = posY;
-	std::shared_ptr<Place>  fieldPrev = (*fieldArr)[posY][posX];
+	SharedPtr<Place>  fieldPrev = (*fieldArr)[posY][posX];
 	switch (direction)
 	{
 	case '8':
@@ -92,21 +92,21 @@ void Character::DIE()
 }
 
 
-void Character::pick_item(std::shared_ptr<Item> item)
+void Character::pick_item(SharedPtr<Item> item)
 {
 	inventory.push_back(item);
 }
 
 
 
-void Character::drop_item(std::shared_ptr<Item> item)
+void Character::drop_item(SharedPtr<Item> item)
 {
-	std::shared_ptr<Item> drop = vector_pop2(inventory, item);
+	SharedPtr<Item> drop = vector_pop2(inventory, item);
 	staysOn->drop_here(drop);
 }
 
 
-void Character::equip_item(std::shared_ptr<Item> item, BodyPart part)
+void Character::equip_item(SharedPtr<Item> item, BodyPart part)
 {
 	if (item->get_twohand())
 	{
@@ -121,7 +121,7 @@ void Character::equip_item(std::shared_ptr<Item> item, BodyPart part)
 
 		equipped[(int)BodyPart::rHand] = item;
 
-		std::shared_ptr<Item> twohandcopy = std::make_shared<Item>(*item);
+		SharedPtr<Item> twohandcopy = std::make_shared<Item>(*item);
 		MyText name = item->get_name();
 		name.set_color_all(MCOL::grey);
 		twohandcopy->set_name(name);
@@ -137,7 +137,7 @@ void Character::equip_item(std::shared_ptr<Item> item, BodyPart part)
 	vector_pop2(inventory, item);
 }
 
-void Character::un_equip_item(std::shared_ptr<Item> item, BodyPart part)
+void Character::un_equip_item(SharedPtr<Item> item, BodyPart part)
 {
 	if (item->get_twohand())
 	{

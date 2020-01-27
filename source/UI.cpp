@@ -77,13 +77,13 @@ void UI::init_texts()
 
 }
 
-std::vector<std::shared_ptr<Item>> UI::pick_items_window(std::vector<std::shared_ptr<Item>>* itemToChoose)
+std::vector<SharedPtr<Item>> UI::pick_items_window(std::vector<SharedPtr<Item>>* itemToChoose)
 {
 	bool choosed = false;
 	int highlightOpt = 0;
 	int size = itemToChoose->size();
 	char input;
-	std::vector<std::shared_ptr<Item>> choosen = {};
+	std::vector<SharedPtr<Item>> choosen = {};
 	int height = itemToChoose->size() * 40 + 40;
 
 	while(!choosed)
@@ -180,7 +180,7 @@ void UI::player_inventory_window()
 	char input;
 	int highlightOpt = 0;
 
-	std::vector< std::shared_ptr<Item>>* inv = player->get_inventory_ref();
+	std::vector< SharedPtr<Item>>* inv = player->get_inventory_ref();
 
 	while (!exit)
 	{
@@ -267,7 +267,7 @@ void UI::player_inventory_window()
 
 
 
-void UI::item_options_window(std::shared_ptr<Item> item)
+void UI::item_options_window(SharedPtr<Item> item)
 {
 	std::string options[3] = { "look", "drop" };
 	options[2] = item->get_isWorn() ? "unequip" : "equip";
@@ -355,7 +355,7 @@ BodyPart UI::pick_bodyPart(BodyPart bodypart)
 	std::string options[BODY_PARTS_COUNT] = { "head   ", "body   ", "hands  ", "legs   ", "rHand  ", "lHand  " };
 	int size = BODY_PARTS_COUNT;
 
-	std::shared_ptr<Item>* eq = player->get_equipped_ref();
+	SharedPtr<Item>* eq = player->get_equipped_ref();
 	BodyPart ret;
 
 	char input;

@@ -133,7 +133,7 @@ void Place::unmake_visible()
 
 }
 
-void Place::drop_here(std::shared_ptr<Item> item)
+void Place::drop_here(SharedPtr<Item> item)
 {
 	itemsHere.push_back(item);
 	printFormat = item->printFormat;
@@ -141,7 +141,7 @@ void Place::drop_here(std::shared_ptr<Item> item)
 		printFormat = characterHere->get_printFormat();
 }
 
-void Place::pick_up(std::shared_ptr<Item> item)
+void Place::pick_up(SharedPtr<Item> item)
 {
 	if (item != nullptr)
 		itemsHere.erase(std::find(itemsHere.begin(), itemsHere.end(), item));

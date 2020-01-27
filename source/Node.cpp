@@ -4,7 +4,7 @@
 int Node::level = 0;
 int Node::nodeCount = -1;
 
-Node::Node(int levelmax, std::shared_ptr<Place> fieldNode1, int length1, int height1, int orientation)
+Node::Node(int levelmax, SharedPtr<Place> fieldNode1, int length1, int height1, int orientation)
 {
 	fieldNode = fieldNode1;
 	//fieldNode->set_printFormat('X');

@@ -3,7 +3,7 @@
 
 
 
-CharacterPlayer::CharacterPlayer(short x, short y, std::vector<std::vector<std::shared_ptr<Place> >> *field)
+CharacterPlayer::CharacterPlayer(short x, short y, std::vector<std::vector<SharedPtr<Place> >> *field)
 {
 	posX = x;
 	posY = y;

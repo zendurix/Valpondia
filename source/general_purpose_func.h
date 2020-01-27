@@ -10,8 +10,6 @@
 
 enum inputType {any, space};
 
-extern const float ACCURACY; // from FieldOfView.cpp
-
 std::ostream & operator << (std::ostream &stream, const sf::String& sfStr);
 
 int get_char_length(sf::Text text);

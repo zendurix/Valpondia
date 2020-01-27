@@ -4,7 +4,7 @@
 
 
 
-CharacterEnemy::CharacterEnemy(short x, short y, std::vector<std::vector<std::shared_ptr<Place> >> *field)
+CharacterEnemy::CharacterEnemy(short x, short y, std::vector<std::vector<SharedPtr<Place> >> *field)
 {
 	posX = x;
 	posY = y;
@@ -37,7 +37,7 @@ void CharacterEnemy::choose_what_to_do()
 }
 
 
-void CharacterEnemy::follow_target_Astar(std::shared_ptr<Place> target)
+void CharacterEnemy::follow_target_Astar(SharedPtr<Place> target)
 {
 	char moveDir = '5';
 	if (distance_meter(*this->get_staysOn(), *target) > 2.0)
@@ -48,7 +48,7 @@ void CharacterEnemy::follow_target_Astar(std::shared_ptr<Place> target)
 }
 
 
-void CharacterEnemy::follow_target_shortest_way(std::shared_ptr<Place> target)
+void CharacterEnemy::follow_target_shortest_way(SharedPtr<Place> target)
 {
 	char directions[8] = { '8', '9', '6', '3', '2', '1', '4', '7' };
 	double distances[8] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
@@ -97,7 +97,7 @@ void CharacterEnemy::follow_target_shortest_way(std::shared_ptr<Place> target)
 
 
 
-void CharacterEnemy::calcullate_distances_for_following(double* distanceArr,std::shared_ptr<Place> target)
+void CharacterEnemy::calcullate_distances_for_following(double* distanceArr,SharedPtr<Place> target)
 {
 	posY -= 1;
 	distanceArr[0] = distance_meter(*this, *target);

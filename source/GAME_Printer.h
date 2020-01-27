@@ -25,5 +25,5 @@ public:
 	void print_field();
 	void print_field_BSP_show(bool placedRooms, std::vector<std::unique_ptr<Node>> &nodes);
 	void print_field_UPDATE();
-	void setupTexture(sf::Sprite &sprite, std::shared_ptr<Place> place, bool test);
+	void setupTexture(sf::Sprite &sprite, SharedPtr<Place> place, bool test);
 };

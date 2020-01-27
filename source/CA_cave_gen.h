@@ -32,14 +32,14 @@ private:
 	CA_Place CA_field[MYHEIGHT][MYLENGTH];
 
 public:
-	CA_cave_gen(bool testing, std::vector<std::vector<std::shared_ptr<Place> >> &fieldArr);
+	CA_cave_gen(bool testing, std::vector<std::vector<SharedPtr<Place> >> &fieldArr);
 	~CA_cave_gen();
 
 	void set_random_state();
 	void make_step();
 	void update_state();
 	int count_neighbours(int y, int x);
-	void set_map(std::vector<std::vector<std::shared_ptr<Place> >> &fieldArr);
+	void set_map(std::vector<std::vector<SharedPtr<Place> >> &fieldArr);
 	bool delete_small_caves();
 	int count_surface(int y, int x, int index);
 	CA_Place* next_in_cave(int y, int x);

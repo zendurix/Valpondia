@@ -33,21 +33,24 @@ private:
 	bool testing;
 	std::vector<std::unique_ptr<Node>> nodes;
 
-public:
-
 	BspMapGen(bool test);
 	~BspMapGen();
 
 	void make_full_tree();
 
-	bool split_dungeon_BSP(std::shared_ptr<Place>  field, std::unique_ptr<Node> &parent, int level);
+	bool split_dungeon_BSP(SharedPtr<Place>  field, std::unique_ptr<Node> &parent, int level);
 
-	void fill_leaves_with_rooms(std::vector <std::shared_ptr <Room>> *rooms);
+	void fill_leaves_with_rooms(std::vector <SharedPtr <Room>> *rooms);
 
 	void connect_all_rooms();
 
-	void connect_2_rooms(std::shared_ptr<Place> searcher1, std::shared_ptr<Place>  searcher2);
+	void connect_2_rooms(SharedPtr<Place> searcher1, SharedPtr<Place>  searcher2);
+
+	void chceck_sizes(int levelmax, int MIN_SIZE);
+
+public:
+	static std::vector<SharedPtr<Room>> make_dung_map_ret_rooms(Vector2D<SharedPtr<Place>> &field, bool test);
+
 
 };
 
-void chceck_sizes(int levelmax, int MIN_SIZE);

@@ -14,7 +14,7 @@ public:
 	{
 		int x;
 		int y;
-		std::shared_ptr<Place> cornerPtr;
+		SharedPtr<Place> cornerPtr;
 	}Corner;
 
 	Corner cornerNW; //1			   1---------------2
@@ -24,12 +24,12 @@ public:
 
 	int roomIndex;
 
-	std::vector <std::shared_ptr <Place> > inRoom;
-	std::vector <std::shared_ptr <Place> > walls;
+	std::vector <SharedPtr <Place> > inRoom;
+	std::vector <SharedPtr <Place> > walls;
 
 	Room();
 	~Room();
 
-	void make_corner(std::shared_ptr <Place> field, int cornerNum);
+	void make_corner(SharedPtr <Place> field, int cornerNum);
 };
 

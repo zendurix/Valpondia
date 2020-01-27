@@ -3,7 +3,7 @@
 
 int Level::levelCount = -1;
 
-Level::Level(lvType p_levelType, int depthLevel, std::shared_ptr<Place>  stairsDown)
+Level::Level(lvType p_levelType, int depthLevel, SharedPtr<Place>  stairsDown)
 {
 	levelCount++;
 	init_field();
@@ -21,14 +21,14 @@ Level::~Level()
 void Level::init_field()
 {
 	field.reserve(MYHEIGHT);
-	for (std::vector <std::shared_ptr<Place> > x : field)
+	for (std::vector <SharedPtr<Place> > x : field)
 	{
 		x.reserve(MYLENGTH);
 	}
 
 	for (int i = 0; i < MYHEIGHT; i++)
 	{
-		std::vector <std::shared_ptr<Place> > fieldRow;
+		std::vector <SharedPtr<Place> > fieldRow;
 		for (int j = 0; j < MYLENGTH; j++)
 		{
 			fieldRow.push_back(std::make_shared<Place> (levelID));
@@ -128,7 +128,7 @@ void Level::RESET_field()
 {
 	for (int i = 0; i < MYHEIGHT; i++)
 	{
-		for (std::shared_ptr<Place> x : field[i])
+		for (SharedPtr<Place> x : field[i])
 		{
 			x->RESET();
 		}
@@ -142,11 +142,11 @@ int Level::getDepth()
 	return depth;
 }
 
-std::shared_ptr<Place>  Level::get_stairsDown()
+SharedPtr<Place>  Level::get_stairsDown()
 {
 	return stairsDown;
 }
-std::shared_ptr<Place>  Level::get_stairsUp()
+SharedPtr<Place>  Level::get_stairsUp()
 {
 	return stairsUp;
 }

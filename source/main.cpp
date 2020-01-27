@@ -66,13 +66,13 @@ int main()
 	MyText aa = Items::steelSword.get_name();
 
 
-	std::shared_ptr<Item> sword = std::make_shared<Item>(Items::steelSword);
-	std::shared_ptr<Item> helmet = std::make_shared<Item>(Items::cardboardHelmet);
-	std::shared_ptr<Item> sword1 = std::make_shared<Item>(Items::steelSword);
-	std::shared_ptr<Item> helmet1 = std::make_shared<Item>(Items::cardboardHelmet);
-	std::shared_ptr<Item> trousers = std::make_shared<Item>(Items::rubberTrousers);
-	std::shared_ptr<Item> sword2h = std::make_shared<Item>(Items::steelSword2h);
-	std::shared_ptr<Item> swordHilt = std::make_shared<Item>(Items::swordHilt);
+	SharedPtr<Item> sword = std::make_shared<Item>(Items::steelSword);
+	SharedPtr<Item> helmet = std::make_shared<Item>(Items::cardboardHelmet);
+	SharedPtr<Item> sword1 = std::make_shared<Item>(Items::steelSword);
+	SharedPtr<Item> helmet1 = std::make_shared<Item>(Items::cardboardHelmet);
+	SharedPtr<Item> trousers = std::make_shared<Item>(Items::rubberTrousers);
+	SharedPtr<Item> sword2h = std::make_shared<Item>(Items::steelSword2h);
+	SharedPtr<Item> swordHilt = std::make_shared<Item>(Items::swordHilt);
 	game->player->pick_item(swordHilt);
 	//sword.melee.hit();
 

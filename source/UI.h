@@ -54,11 +54,11 @@ public:
 
 	static void init_UI(sf::RenderWindow* win, Character* playerChar);
 
-	static std::vector<std::shared_ptr<Item>> pick_items_window(std::vector<std::shared_ptr<Item>>* itemToChoose);
+	static std::vector<SharedPtr<Item>> pick_items_window(std::vector<SharedPtr<Item>>* itemToChoose);
 
 	static void player_inventory_window();
 
-	static void item_options_window(std::shared_ptr<Item> item);
+	static void item_options_window(SharedPtr<Item> item);
 
 	static BodyPart pick_bodyPart(BodyPart bodypart);
 
