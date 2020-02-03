@@ -15,6 +15,7 @@ GAME* GAME::getInstance()
 		LOG_NEW;
 		instance = new GAME();
 		instance->init_components();
+		LOG("GAME created");
 	}
 	return instance;
 }
@@ -40,8 +41,10 @@ void GAME::init_components()
 {
 	LOG_NEW;
 	Printer = new GAME_Printer(this);
+	LOG("GAME Printer initialized");
 	LOG_NEW;
 	CharControler = new GAME_charControler(this);
+	LOG("GAME CharControler initialized");
 }
 
 
@@ -70,15 +73,11 @@ void GAME::make_new_level(lvType levelType)
 	newLevel->make_level();
 	newLevel->place_stairsDown_random();
 	levels.push_back(newLevel);
+	FieldOfView::set_fieldArr(&levelActive->field);
 }
 
 void GAME::reset_visibility(Character character)
-{
-	//std::vector<SharedPtr<Place> > checkAgain;
-
-
-
-	
+{	
 	FieldOfView::update_view(character.get_staysOn());
 	for (int i = 0; i < MYHEIGHT; i++)
 	{
@@ -91,8 +90,7 @@ void GAME::reset_visibility(Character character)
 				levelActive->field[i][j]->set_wasVisible(false);
 			}
 		}
-	}
-	
+	}	
 }
 
 void GAME::RESET_levels()
@@ -112,6 +110,8 @@ void GAME::RESET_levels()
 
 	player->set_onLevelID(0);
 	player->set_fieldArr(&levelActive->field);
+
+	FieldOfView::set_fieldArr(&levelActive->field);
 }
 
 

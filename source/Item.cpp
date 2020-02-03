@@ -8,11 +8,17 @@ Item::Item(itemType Ittype, BodyPart bodypart, itemMaterial Itmaterial, int Itwe
 	type(Ittype), material(Itmaterial), bodyPart(bodypart), weight(Itweight), flavorText(text),
 	melee(mele), ranged(rang), defend(def), use(us), printFormat(printForm), twoHand(twohand)
 {
+	isWorn = false;
+	wornOnBodyPart = BodyPart::none;
+
 	value = Itvalue * (int)material;
 
 	name += _name;
 	name += MyText(strCol("   ", COL::White));
+	name += MyText(strCol("(", COL::White));
 	name += itemTMaterials[(int)material];
+	name += MyText(strCol(")", COL::White));
+
 	
 
 }

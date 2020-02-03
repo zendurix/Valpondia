@@ -4,7 +4,7 @@
 
 
 
-void FieldOfView::update_view(SharedPtr<Place>  placeChar)
+void FieldOfView::update_view(SharedPtr<Place> placeChar)
 {
 	std::thread qrt1(update_1qrt, placeChar);
 	std::thread qrt2(update_2qrt, placeChar);
@@ -145,26 +145,27 @@ char FieldOfView::set_quarter(float& angle)
 
 SharedPtr<Place>  FieldOfView::step_tracer(SharedPtr<Place>  tracer, char& quarter, char&& dir)
 {// '|' vertical  '-' horizontal   '/' diagonally
-	GAME* game = GAME::getInstance();
-	std::vector<std::vector<SharedPtr<Place> >> &fieldArr = game->levelActive->field;
-
 	switch (quarter)
 	{
 	case 1:
-		tracer = (dir == '|') ? fieldArr[tracer->get_y() - 1][tracer->get_x()] : ((dir == '-') ?
-				fieldArr[tracer->get_y()][tracer->get_x() + 1] : fieldArr[tracer->get_y() - 1][tracer->get_x() + 1]);
+		tracer = (dir == '|') ? (*fieldArr)[tracer->get_y() - 1][tracer->get_x()] : 
+				((dir == '-') ?	(*fieldArr)[tracer->get_y()][tracer->get_x() + 1] : 
+				/*dir == '/'*/	(*fieldArr)[tracer->get_y() - 1][tracer->get_x() + 1]);
 		break;
 	case 2:
-		tracer = (dir == '|') ? fieldArr[tracer->get_y() + 1][tracer->get_x()] : ((dir == '-') ?
-				fieldArr[tracer->get_y()][tracer->get_x() + 1] : fieldArr[tracer->get_y() + 1][tracer->get_x() + 1]);
+		tracer = (dir == '|') ? (*fieldArr)[tracer->get_y() + 1][tracer->get_x()] :
+				((dir == '-') ? (*fieldArr)[tracer->get_y()][tracer->get_x() + 1] :
+				/*dir == '/'*/  (*fieldArr)[tracer->get_y() + 1][tracer->get_x() + 1]);
 		break;
 	case 3:
-		tracer = (dir == '|') ? fieldArr[tracer->get_y() + 1][tracer->get_x()] : ((dir == '-') ?
-				fieldArr[tracer->get_y()][tracer->get_x() - 1] : fieldArr[tracer->get_y() + 1][tracer->get_x() - 1]);
+		tracer = (dir == '|') ? (*fieldArr)[tracer->get_y() + 1][tracer->get_x()] :
+				((dir == '-') ? (*fieldArr)[tracer->get_y()][tracer->get_x() - 1] :
+				/*dir == '/'*/	(*fieldArr)[tracer->get_y() + 1][tracer->get_x() - 1]);
 		break;
 	case 4:
-		tracer = (dir == '|') ? fieldArr[tracer->get_y() - 1][tracer->get_x()] : ((dir == '-') ?
-				fieldArr[tracer->get_y()][tracer->get_x() - 1] : fieldArr[tracer->get_y() - 1][tracer->get_x() - 1]);
+		tracer = (dir == '|') ? (*fieldArr)[tracer->get_y() - 1][tracer->get_x()] :
+				((dir == '-') ? (*fieldArr)[tracer->get_y()][tracer->get_x() - 1] :
+				/*dir == '/'*/	(*fieldArr)[tracer->get_y() - 1][tracer->get_x() - 1]);
 		break;
 	}
 	tracer->make_visible();

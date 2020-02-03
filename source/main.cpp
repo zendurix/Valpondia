@@ -2,6 +2,7 @@
 
 #include "CONFIGURATION.h"
 #include "MapFunctions.h"
+#include "Input.h"
 #include "MENU.h"
 #include "GAME.h"
 
@@ -15,25 +16,18 @@ void MENU_DEBUG_handler(MENU menu);
 int main()
 {
 	MyText initit;
-	//STD_FONT = new sf::Font;
-	//STD_FONT->loadFromFile("../SFML/sources/DOSfont.ttf");
-
-
-
-	//static MyText mm = MyText();
-
-
 
 	GAME* game = GAME::getInstance();
 	game->make_new_level(cave); // for first level initializing
 	
 	sf::RenderWindow window(sf::VideoMode(WIN_LENGTH, WIN_HEIGHT), "Project");
 	game->setWindow(&window);
+	Input::init_Input(&window);
 		
 	LOG_NEW;
 	game->player = new CharacterPlayer(2, 2, &game->levelActive->field);
 
-	UI::init_UI(&window, game->player);
+	UI::init_UI(&window);
 
 
 	
@@ -113,13 +107,23 @@ int main()
 			//mainTheme.play();
 			wait = true;
 
-			game->levelActive->field[10][10]->drop_here(helmet);
-			game->levelActive->field[10][10]->drop_here(sword);
-			game->levelActive->field[10][10]->drop_here(helmet1);
-			game->levelActive->field[10][10]->drop_here(sword1);
-			game->levelActive->field[10][10]->drop_here(trousers);
+			int itemY = game->player->get_y()+1;
+			int itemX = game->player->get_x()+1;
+			game->levelActive->field[itemY][itemX]->drop_here(helmet);
+			game->levelActive->field[itemY][itemX]->drop_here(sword);
+			game->levelActive->field[itemY][itemX]->drop_here(helmet1);
+			game->levelActive->field[itemY][itemX]->drop_here(sword1);
+			game->levelActive->field[itemY][itemX]->drop_here(trousers);
 
 			game->levelActive->field[13][13]->drop_here(sword2h);
+
+			for (int i = 0; i < 0; i++)
+			{
+				SharedPtr<Item> sword = std::make_shared<Item>(Items::steelSword);
+				SharedPtr<Item> helmet = std::make_shared<Item>(Items::cardboardHelmet);
+				game->levelActive->field[itemY][itemX]->drop_here(helmet);
+				game->levelActive->field[itemY][itemX]->drop_here(sword);
+			}
 
 			while (wait) /////////////////////////////////////////////////// GAME LOOP
 			{
@@ -182,7 +186,7 @@ bool MENU_handler_ret_startGame(MENU menu, bool* exit)
 	case caveShow:
 		game->levelActive->changeLevelType(cave);			
 		game->Printer->print_field();
-		wait_for_input(space);
+		Input::wait_for_input(inputType::space);
 		return false;
 	case caveStep:
 		make_cave_map(true, game->levelActive->field);
@@ -190,7 +194,7 @@ bool MENU_handler_ret_startGame(MENU menu, bool* exit)
 	case dungShow:
 		game->levels[game->levelActiveId]->changeLevelType(dungeon);
 		game->Printer->print_field();
-		wait_for_input(space);
+		Input::wait_for_input(inputType::space);
 		return false;
 	case dungStep:
 		//make_dung_map_ret_rooms(true);
@@ -226,7 +230,7 @@ void MENU_DEBUG_handler(MENU menu)
 
 	while (loop)
 	{
-		option = user_input_key();
+		option = Input::user_input_key();
 		switch (option)
 		{
 		case '1':

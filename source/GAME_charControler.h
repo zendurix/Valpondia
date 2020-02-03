@@ -2,7 +2,9 @@
 // component of GAME class, responsible for making actions and managing characters (AI and player)
 
 #include "GAME.h"
+#include "Input.h"
 #include "UI.h"
+#include "FieldOfView.h"
 
 class GAME;
 
@@ -21,5 +23,7 @@ public:
 	void move_level_up(Character* ch);
 	void pick_up_item(Character* ch);
 	void player_inventory_control();
+	void player_equipment_control();
+	void item_options_control(SharedPtr<Item> item);
 };
 

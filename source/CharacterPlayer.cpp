@@ -5,6 +5,14 @@
 
 CharacterPlayer::CharacterPlayer(short x, short y, std::vector<std::vector<SharedPtr<Place> >> *field)
 {
+
+	armorBasic = 0;
+
+
+	name = "zendurix";
+	hpMax = 37;
+	hpLeft = 21;
+
 	posX = x;
 	posY = y;
 	printFormat = '@';

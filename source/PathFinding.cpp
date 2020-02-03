@@ -2,7 +2,7 @@
 #include "PathFinding.h"
 
 
-char PathFinding::calc_dir(SharedPtr<Place> origin, SharedPtr<Place> target)
+char PathFinding::calculate_dir(SharedPtr<Place> origin, SharedPtr<Place> target)
 {
 	int x1 = origin->get_x();
 	int y1 = origin->get_y();
@@ -50,8 +50,11 @@ char PathFinding::best_dir(Character character, SharedPtr<Place> target)
 std::pair<char, int> PathFinding::Astar_path_dir_dist(SharedPtr<Place> start, SharedPtr<Place> end)
 {
 	auto calc_h = [&](AstarNode curr)
-	{ return std::max(abs(curr.placeX - end->get_x()), abs(curr.placeY - end->get_y())) + 
-		std::min(abs(curr.placeX - end->get_x()), abs(curr.placeY - end->get_y())) * DISTANCE_DIAG_ADD; };
+	{ 
+		return std::max(abs(curr.placeX - end->get_x()), abs(curr.placeY - end->get_y())) + 
+			+ std::min(abs(curr.placeX - end->get_x()), abs(curr.placeY - end->get_y())) * DISTANCE_DIAG_ADD;
+	};
+
 	auto calc_g = [&](bool diag) {return (diag) ? q.g + DISTANCE_DIAG : q.g + DISTANCE; };
 
 	std::vector <AstarNode> openVec;
@@ -64,32 +67,35 @@ std::pair<char, int> PathFinding::Astar_path_dir_dist(SharedPtr<Place> start, Sh
 	openVec.push_back(starting);
 
 	bool found = false;
-	int q_pos = 0;
+	int qPos = 0;
 
 	while (!found)
 	{
-		q_pos = find_lowest_f_pos(openVec);
-		qPtr = std::make_shared<AstarNode>(openVec[q_pos]); 
-		q = vector_pop(openVec, q_pos);
+		qPos = find_lowest_f_position(openVec);
+		qPtr = std::make_shared<AstarNode>(openVec[qPos]);
+		q = vector_pop(openVec, qPos);
 		closedVec.push_back(q);		
 
 		if (q.placePtr == end) { found = true; break; }
 
-		make_q_neighbours();
+		make_neighbours_of_q();
 
 		for (AstarNode *node : q_neighbours)
 		{
 			if (node->placePtr != nullptr)
 			{
 				if (node->placePtr->get_isObstacle())
-				{
 					continue;
+
+				if (node->placePtr == end) 
+				{ 
+					found = true;
+					break; 
 				}
 
-				if (node->placePtr == end) { found = true; break; }
 				node->h = calc_h(*node);
 				
-				char checkDir = calc_dir(q.placePtr, node->placePtr);
+				char checkDir = calculate_dir(q.placePtr, node->placePtr);
 				if (checkDir == '7' || checkDir == '9' || checkDir == '1' || checkDir == '3')
 					node->g = calc_g(true);
 				else
@@ -99,6 +105,7 @@ std::pair<char, int> PathFinding::Astar_path_dir_dist(SharedPtr<Place> start, Sh
 
 				auto posList = std::find(openVec.begin(), openVec.end(), *node);
 				auto posListChecked = std::find(closedVec.begin(), closedVec.end(), *node);
+
 				if (posList != openVec.end())
 				{ // if openVec contains same node, but with higher f it will be updated
 					if (node->f < posList->f)
@@ -120,7 +127,7 @@ std::pair<char, int> PathFinding::Astar_path_dir_dist(SharedPtr<Place> start, Sh
 
 	std::vector<SharedPtr<Place>> path = make_path(closedVec, end);
 	int distance = path.size() - 1;
-	char dir = calc_dir(start, path.at(path.size() - 2));
+	char dir = calculate_dir(start, path.at(path.size() - 2));
 
 	return std::pair<char, int> (dir, distance);
 }
@@ -128,8 +135,7 @@ std::pair<char, int> PathFinding::Astar_path_dir_dist(SharedPtr<Place> start, Sh
 
 
 
-
-int PathFinding::find_lowest_f_pos(std::vector<AstarNode> nodes)
+int PathFinding::find_lowest_f_position(std::vector<AstarNode> nodes)
 {
 	float minF = 1000000;
 	int minPos = -1;
@@ -149,7 +155,7 @@ int PathFinding::find_lowest_f_pos(std::vector<AstarNode> nodes)
 
 
 
-void PathFinding::make_q_neighbours()
+void PathFinding::make_neighbours_of_q()
 {
 	if (q.placeX > 0)
 	{

@@ -1,16 +1,14 @@
 #pragma once
 
 #include "CONFIGURATION.h"
-#include "general_purpose_func.h"
 #include "MapFunctions.h"
 #include "Place.h"
-#include "Character.h"
-#include "GAME.h"
-
 
 class FieldOfView
 {
 private:
+	inline static Vector2D<SharedPtr<Place>>* fieldArr = nullptr;
+
 	FieldOfView() = delete;
 
 	static void update_1qrt(SharedPtr<Place> placeChar);
@@ -25,7 +23,9 @@ private:
 	static SharedPtr<Place>  step_tracer(SharedPtr<Place> tracer, char& quarter, char&& dir);
 
 public:
-	static void update_view(SharedPtr<Place> placeChar);
+	static void update_view( SharedPtr<Place> placeChar);
+
+	static void set_fieldArr(Vector2D<SharedPtr<Place>>* fieldPtr) { FieldOfView::fieldArr = fieldPtr; }
 };
 
 

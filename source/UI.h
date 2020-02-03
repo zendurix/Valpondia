@@ -2,19 +2,17 @@
 
 // User Interface class
 
-
+#include "UIWindow.h"
 #include "MyText.h"
-
-#include "Item.h"
 #include "Character.h"
+#include "CharacterPlayer.h"
+
+class UIWindow;
 
 
-
-
-class UI
+class UI // static class
 {
 private:	
-	typedef std::pair<std::string, sf::Color> strCol;
 	typedef std::vector<strCol> MyTextVext;
 	typedef sf::Color COL;
 
@@ -22,14 +20,15 @@ private:
 	inline static bool initialized = false; 
 
 	inline static sf::RenderWindow* window;
-	inline static Character* player;
 	
 	inline static sf::RectangleShape blackWin;
 	inline static sf::RectangleShape smallBlackWin;
 	inline static sf::RectangleShape fullBlackWin;
 	inline static sf::RectangleShape bodyPartBlackWin;
-	inline static sf::RectangleShape tickBox;
 
+	inline static sf::RectangleShape playerUIWin;
+
+	//inline static sf::RectangleShape tickBox;
 
 
 	inline static sf::Text *text;
@@ -40,28 +39,35 @@ private:
 
 	inline static MyText invTitle = MyText();
 
-
+	// PRIVATE FUNCTIONS:
+	static void init_windows();
 	static void init_texts();
 
+	static sf::Color get_hp_color(const Character& character);
 
-public:
-	UI() = delete;
-
-	
 	static int center_text_posX(sf::Text text, int centeringLength = WIN_LENGTH);
 	static int center_text_posX(MyText text, int centeringLength = WIN_LENGTH);
 	static int center_text_posY(sf::Text text, int centeringHeight = WIN_HEIGHT);
 
-	static void init_UI(sf::RenderWindow* win, Character* playerChar);
+// private
 
-	static std::vector<SharedPtr<Item>> pick_items_window(std::vector<SharedPtr<Item>>* itemToChoose);
+public:
+	UI() = delete;
 
-	static void player_inventory_window();
+	static void init_UI(sf::RenderWindow* win);
 
-	static void item_options_window(SharedPtr<Item> item);
+	static void draw_player_UI(const CharacterPlayer& player);
 
-	static BodyPart pick_bodyPart(BodyPart bodypart);
+	static std::vector<int> pickUp_items_selector(const std::vector<SharedPtr<Item>>* itemToChoose);
 
+	static int player_inventory_selector(const std::vector<SharedPtr<Item>>* inventory);
 
+	static BodyPart player_equipment_selector(const SharedPtr<Item>* equpment);
+
+	static BodyPart choose_bodyPart_to_equip(const SharedPtr<Item> item, const SharedPtr<Item>* equipment);
+
+	static ItemOpt item_options_selector(const SharedPtr<Item> item);
+
+	static int equip_from_inv_selector(BodyPart bodyPartToEquip, const std::vector<SharedPtr<Item>>* inventory);
 };
 

@@ -99,6 +99,7 @@ void GAME_Printer::print_field_UPDATE()
 
 		}
 	}
+	UI::draw_player_UI(*g->player);
 	g->windowHandle->display();
 }
 
@@ -183,28 +184,33 @@ void GAME_Printer::load_textures()
 	texture1->loadFromFile("../SFML/sources/16x16/wallRock.png");
 	rock_wall.setTexture(*texture1);
 	textures.push_back(rock_wall);
+	LOG("wallRock.png loaded");
 
 	sf::Texture* texture3 = new sf::Texture;
 	LOG_NEW;
 	texture3->loadFromFile("../SFML/sources/16x16/floor.png");
 	floor_tile.setTexture(*texture3);
 	textures.push_back(floor_tile);
+	LOG("floor.png loaded");
 
 	sf::Texture* texture2 = new sf::Texture;
 	LOG_NEW;
 	texture2->loadFromFile("../SFML/sources/16x16/wallBrick.png");
 	stone_wall.setTexture(*texture2);
 	textures.push_back(stone_wall);
+	LOG("wallBrick.png loaded");
 
 	sf::Texture* texture4 = new sf::Texture;
 	LOG_NEW;
 	texture4->loadFromFile("../SFML/sources/16x16/player.png");
 	player_tile.setTexture(*texture4);
 	textures.push_back(player_tile);
+	LOG("player.png loaded");
 
 	sf::Texture* texture5 = new sf::Texture;
 	LOG_NEW;
 	texture5->loadFromFile("../SFML/sources/16x16/sword.png");
 	sword_tile.setTexture(*texture5);
 	textures.push_back(sword_tile);
+	LOG("sword.png loaded");
 }

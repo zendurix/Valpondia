@@ -14,7 +14,7 @@ int UI::center_text_posX(MyText text, int centeringLength)
 {
 	int charLength = text.get_charLength();
 	int size = text.get_string().size();
-	int posX = centeringLength / 2 - (size / 2) * (charLength + 1);
+	int posX = centeringLength / 2 - (size / 2) * (charLength + 4);
 	return posX;
 }
 
@@ -25,412 +25,323 @@ int UI::center_text_posY(sf::Text text, int centeringHeight)
 	return posY;
 }
 
-void UI::init_UI(sf::RenderWindow* win, Character* playerChar)
+
+sf::Color UI::get_hp_color(const Character& character)
+{
+	int hpProc = ((double)character.get_hpLeft() / (double)character.get_hpMax()) * 100.0;
+
+	if (hpProc == 100)		return MCOL::hpProc100;
+	else if (hpProc >= 80)	return MCOL::hpProc80;
+	else if (hpProc >= 60)	return MCOL::hpProc60;
+	else if (hpProc >= 40)	return MCOL::hpProc40;
+	else if (hpProc >= 20)	return MCOL::hpProc20;
+	else					return MCOL::hpProc0;
+
+}
+
+
+
+
+
+
+
+
+
+
+void UI::init_UI(sf::RenderWindow* win)
 {
 	if (!initialized)
 	{
 		initialized = true;
 
 		window = win;
-		player = playerChar;
 
-		smallBlackWin = sf::RectangleShape(sf::Vector2f(500, 300));
-		smallBlackWin.setFillColor(sf::Color::Black);
-		smallBlackWin.setOutlineColor(sf::Color::Blue);
-		smallBlackWin.setOutlineThickness(4);
-		smallBlackWin.setPosition(100, 100);
-
-
-		bodyPartBlackWin = sf::RectangleShape(sf::Vector2f(600, BODY_PARTS_COUNT * (CHAR_SIZE+10)));
-		bodyPartBlackWin.setFillColor(sf::Color::Black);
-		bodyPartBlackWin.setOutlineColor(sf::Color::Blue);
-		bodyPartBlackWin.setOutlineThickness(4);
-		bodyPartBlackWin.setPosition(100, 100);
-
-
-		int fullWinOutThick = 8;
-		fullBlackWin = sf::RectangleShape(sf::Vector2f(WIN_LENGTH - fullWinOutThick * 2, WIN_HEIGHT - fullWinOutThick * 2));
-		fullBlackWin.setFillColor(sf::Color::Black);
-		fullBlackWin.setOutlineColor(sf::Color::Green);
-		fullBlackWin.setOutlineThickness(fullWinOutThick);
-		fullBlackWin.setPosition(fullWinOutThick, fullWinOutThick);
-
-		tickBox = sf::RectangleShape(sf::Vector2f(10, 10));
-		tickBox.setFillColor(sf::Color::White);
-		tickBox.setOutlineColor(MCOL::brown);
-		tickBox.setOutlineThickness(3);
-		
-		blackWin = smallBlackWin;
-
-
+		init_windows();
 		init_texts();
+		LOG("User Interface initialized");
 	}
 }
 
+
+void UI::init_windows()
+{
+	const int outThicc = 5;
+	playerUIWin = sf::RectangleShape(sf::Vector2f(UI_LENGTH - 2 * outThicc, WIN_HEIGHT - 2 * outThicc));
+	playerUIWin.setFillColor(MCOL::slatGrey);
+	playerUIWin.setOutlineColor(MCOL::brown);
+	playerUIWin.setOutlineThickness(outThicc);
+	playerUIWin.setPosition(WIN_LENGTH - UI_LENGTH + outThicc, outThicc);
+}
 
 void UI::init_texts()
 {
 	text = init_text();
 	myText = MyText(strCol("", COL::White), 32, 0, 0, MyText::get_STD_FONT());
 	invTitle = MyText(strCol("INVENTORY", COL::Yellow), 32, 0, 0, MyText::get_STD_FONT());
-
-
 }
 
-std::vector<SharedPtr<Item>> UI::pick_items_window(std::vector<SharedPtr<Item>>* itemToChoose)
-{
-	bool choosed = false;
-	int highlightOpt = 0;
-	int size = itemToChoose->size();
-	char input;
-	std::vector<SharedPtr<Item>> choosen = {};
-	int height = itemToChoose->size() * 40 + 40;
 
-	while(!choosed)
+
+
+
+
+
+
+
+
+void UI::draw_player_UI(const CharacterPlayer& player)
+{
+	window->draw(playerUIWin);
+
+	int posX = WIN_LENGTH - UI_LENGTH + 10;;
+	
+	myText.clear();
+	myText = strCol(player.get_name(), COL::White);
+	myText.setPosition(posX, 20);
+	myText.window_draw(window);
+
+	myText.clear();
+	std::string hpStr = std::to_string(player.get_hpLeft()) + "/" + std::to_string(player.get_hpMax());
+	myText = strCol("HP:", COL::White);
+	static sf::Color hpColor = get_hp_color(player);
+	myText += strCol(hpStr, hpColor);
+	myText.setPosition(posX, 50);
+	myText.window_draw(window);
+
+	myText.clear();
+	myText = strCol("ARMOR: " + std::to_string(player.get_armorBasic()), COL::White);
+	myText.setPosition(posX, 80);
+	myText.window_draw(window);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+std::vector<int> UI::pickUp_items_selector(const std::vector<SharedPtr<Item>>* itemToChoose)
+{
+	std::vector<int> choosenIndexes;
+	std::vector<MyText> itemTexts;
+	for (auto item : *itemToChoose)
+		itemTexts.push_back(item->get_name());
+
+	MyText title = strCol("PICK", MCOL::brown);
+	int charHeight = title.get_charHeight();
+
+	UIWindow UIwin(500, 400, 100, 100, title, itemTexts, charHeight);
+	UIwin.add_tickBoxes();
+	choosenIndexes = UIwin.call_window_return_choosen_indexes(window);
+
+	return choosenIndexes;
+}
+
+
+
+
+
+
+
+
+
+
+
+int UI::player_inventory_selector(const std::vector< SharedPtr<Item>>* inv)
+{
+	int ret;
+	int choosenIndex;
+	std::vector<MyText> itemTexts;
+	MyText title = strCol("INVENTORY", MCOL::limeGreen);
+
+	for (auto item : *inv)
+		itemTexts.push_back(item->get_name());
+	int charHeight = title.get_charHeight();
+
+	UIWindow UIwin(WIN_LENGTH, WIN_HEIGHT, 0, 0, title, itemTexts, charHeight, false, 10);
+	choosenIndex = UIwin.call_window_return_choosen_indexes(window)[0];
+
+	return choosenIndex;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ItemOpt UI::item_options_selector(SharedPtr<Item> item)
+{
+	int optionsSize;
+	std::vector<MyText> options = { strCol("look", COL::White), strCol("drop", COL::White) };
+	options.push_back( item->get_isWorn() ? strCol("unequip", COL::White) : strCol("equip", COL::White ));
+	optionsSize = 3;
+	if (item->use.get_type() != useType::noUse)
 	{
-
-		blackWin.setSize(sf::Vector2f(blackWin.getSize().x, height));
-		window->draw(blackWin);
-
-		int x = blackWin.getPosition().x + 35;
-		int y = blackWin.getPosition().y + 30;
-
-
-
-		for (int i = 0; i < size; i++)
-		{
-			myText = (*itemToChoose)[i]->get_name();
-			myText.setPosition(x, y);
-
-			if (i == highlightOpt) myText.set_color_first(sf::Color::Yellow);
-			else				   myText.set_color_first((*itemToChoose)[i]->get_name().get_color_first());
-
-
-			tickBox.setPosition(x - 20, y + 18);
-
-			if (std::find(choosen.begin(), choosen.end(), (*itemToChoose)[i]) != choosen.end())
-				 tickBox.setFillColor(sf::Color::Yellow);
-			else tickBox.setFillColor(sf::Color::White);
-
-			window->draw(tickBox);
-			myText.window_draw(window);
-
-			y += CHAR_SIZE + 3;
-
-		}
-		window->display();
-
-		sleep_for_milliseconds(150);
-		input = user_input_key();
-		switch (input)
-		{
-		case  '8':		highlightOpt--;		break;
-		case  '2':		highlightOpt++;		break;
-		case  ' ':	
-		{
-			if (std::find(choosen.begin(), choosen.end(), (*itemToChoose)[highlightOpt]) == choosen.end())
-				choosen.push_back((*itemToChoose)[highlightOpt]); 
-			else
-				choosen.erase(std::find(choosen.begin(), choosen.end(), (*itemToChoose)[highlightOpt]));
-			break;
-		}
-		case '\t': // take all
-		{
-			for (int i = 0; i < size; i++)
-			{
-				if (std::find(choosen.begin(), choosen.end(), (*itemToChoose)[i]) == choosen.end())
-					choosen.push_back((*itemToChoose)[i]);
-				else
-					;				
-			}
-			choosed = true;
-			break;
-		}
-		case '\n':		choosed = true;		break;
-		case STD_ESC:
-			choosed = true;
-			choosen.clear();
-			break;
-
-		default :			break;
-		}
-
-		highlightOpt = (highlightOpt == -1) ? 0 : ((highlightOpt == size) ? size - 1 : highlightOpt);
+		options.push_back(strCol("use", COL::White));
+		optionsSize = 4;
 	}
-	return choosen;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-void UI::player_inventory_window()
-{
-	bool exit = false;
-	char input;
-	int highlightOpt = 0;
-
-	std::vector< SharedPtr<Item>>* inv = player->get_inventory_ref();
-
-	while (!exit)
-	{
-		window->draw(fullBlackWin);		
-		
-		int centX = center_text_posX(invTitle);
-		invTitle.setPosition(centX, 20);
-		invTitle.window_draw(window);
-
-		int x = 30;
-		int y = 50;
-		int size = inv->size();
-
-		for (int i = 0; i < size; i++)
-		{
-			myText = (*inv)[i]->get_name();
-			myText.setPosition(x, y);
-
-			if (i == highlightOpt) myText.set_color_first(sf::Color::Yellow);
-			else				   myText.set_color_first((*inv)[i]->get_name().get_color_first());
-
-			myText.window_draw(window);
-			y += CHAR_SIZE;
-		}
-			   		 	     	 	  	  	   	
-
-		window->display();
-
-
-		input = user_input_key();
-
-		switch (input)
-		{
-		case STD_ESC:
-			exit = true;
-			break;
-		case '8':
-			highlightOpt--;
-			break;
-		case '2':
-			highlightOpt++;
-			break;
-		case '\n':
-		{
-			window->draw(fullBlackWin);
-
-			int centX = center_text_posX(invTitle);
-			invTitle.setPosition(centX, 20);
-			invTitle.window_draw(window);
-
-			x = 30;
-			y = 50;
-			for (int i = 0; i < size; i++)
-			{
-				myText = (*inv)[i]->get_name();
-				myText.setPosition(x, y);
-
-				if (i == highlightOpt) myText.set_color_first(sf::Color::Yellow);
-				else				   myText.set_color_first((*inv)[i]->get_name().get_color_first());
-
-				myText.window_draw(window);
-				y += CHAR_SIZE;
-			}
-			window->display();
-			item_options_window((*inv)[highlightOpt]);
-			if (inv->size() < size)
-				size--;
-			window->display();
-		}
-			break;
-		default:
-			break;
-					   			 
-		}
-		
-		highlightOpt = (highlightOpt == -1) ? (size - 1) : ((highlightOpt == size) ? 0 : highlightOpt);
-		sleep_for_milliseconds(150);
-
-	}
-
-}
-
-
-
-
-
-void UI::item_options_window(SharedPtr<Item> item)
-{
-	std::string options[3] = { "look", "drop" };
-	options[2] = item->get_isWorn() ? "unequip" : "equip";
-	int size = 3;
-
-	char input;
-	int highlightOpt = 0;
-	bool exit = false;
 
 	int x = 420;
 	int y = 340;
+	int winLength = 500;
+	int winHeight = 300;
+	ItemOpt ret;
 
+	MyText title = item->get_name();
+	int charHeight = title.get_charHeight();
 
-	smallBlackWin.setPosition(400, 300);
+	UIWindow UIwin(winLength, winHeight, x, y, title, options, charHeight);
 
-	while (!exit)
-	{
-		sleep_for_milliseconds(150);
-		x = 420;
-		y = 380;
+	int choosenIndex = UIwin.call_window_return_choosen_indexes(window)[0];
 
-		window->draw(smallBlackWin);
-		myText = item->get_name();
-		myText.setPosition(410, 310);
-		myText.window_draw(window);
-		for (int i = 0; i < size; i++)
-		{
-			text->setPosition(x, y);
-			text->setString(options[i]);
+	if		(options[choosenIndex].get_string() == "look")	  ret = ItemOpt::look;
+	else if (options[choosenIndex].get_string() == "drop")	  ret = ItemOpt::drop;
+	else if (options[choosenIndex].get_string() == "equip")	  ret = ItemOpt::equip;
+	else if (options[choosenIndex].get_string() == "unequip") ret = ItemOpt::unequip;
+	else if (options[choosenIndex].get_string() == "use")	  ret = ItemOpt::use;
 
-			if (i == highlightOpt) text->setFillColor(sf::Color::Yellow);
-			else				   text->setFillColor(sf::Color::White);
-
-			window->draw(*text);
-			y += CHAR_SIZE;
-		}
-		window->display();
-
-
-		input = user_input_key();
-
-		switch (input)
-		{
-		case STD_ESC:
-			exit = true;
-			break;
-		case '8':
-			highlightOpt--;
-			break;
-		case '2':
-			highlightOpt++;
-			break;
-		case '\n':
-		{
-			if (options[highlightOpt] == "look")
-				; // info about obj
-			else if (options[highlightOpt] == "drop")
-				player->drop_item(item);
-			else if (options[highlightOpt] == "equip")
-			{
-				BodyPart bodypart = pick_bodyPart(item->get_bodyPart());
-				player->equip_item(item, bodypart); 
-			}
-			else if (options[highlightOpt] == "unequip")
-				; ////
-			exit = true;
-		}
-			break;
-		default:
-			break;
-
-		}
-
-
-		highlightOpt = (highlightOpt == -1) ? (size - 1) : ((highlightOpt == size) ? 0 : highlightOpt);
-	}
-
-
+	return ret;
 }
 
 
 
-BodyPart UI::pick_bodyPart(BodyPart bodypart)
-{
-	std::string options[BODY_PARTS_COUNT] = { "head   ", "body   ", "hands  ", "legs   ", "rHand  ", "lHand  " };
-	int size = BODY_PARTS_COUNT;
 
-	SharedPtr<Item>* eq = player->get_equipped_ref();
+
+
+
+
+
+
+
+
+
+
+
+
+BodyPart UI::choose_bodyPart_to_equip(const SharedPtr<Item> item, const SharedPtr<Item>* eq)
+{
+	std::string optionsStrings[BODY_PARTS_COUNT] = { "head   ", "body   ", "hands  ", "legs   ", "rHand  ", "lHand  " };
+	//int size = BODY_PARTS_COUNT;
+
+	BodyPart itemForBodyPart = item->get_bodyPart();
 	BodyPart ret;
 
-	char input;
-	int highlightOpt = (bodypart == BodyPart::forHands) ? (int)BodyPart::lHand : (int)bodypart;
-	bool exit = false;
+	std::vector<MyText> options;
+	std::vector<int> aviableOptIndexes;
+	aviableOptIndexes.reserve(2);
 
-	int x;
-	int y;
-
-	bodyPartBlackWin.setPosition(400, 300);
-
-	while (!exit)
+	if (itemForBodyPart == BodyPart::forHands)
 	{
-		sleep_for_milliseconds(150);
-		x = 420;
-		y = 320;
+		aviableOptIndexes.push_back(static_cast<int>(BodyPart::rHand));
+		aviableOptIndexes.push_back(static_cast<int>(BodyPart::lHand));
+	}
+	else
+		aviableOptIndexes.push_back(static_cast<int>(itemForBodyPart));
 
-		window->draw(bodyPartBlackWin);
-		for (int i = 0; i < size; i++)
-		{
-			myText.clear();
-			myText.setPosition(x, y);
-			myText += strCol(options[i], COL::White);
-			myText += (eq[i]) ? eq[i]->get_name() : strCol("none ", MCOL::grey);
+	for (int index : aviableOptIndexes)
+	{
+		myText.clear();
+		myText = strCol(optionsStrings[index], COL::White);
+		myText += (eq[index]) ? eq[index]->get_name() : strCol("none ", MCOL::grey);
+		options.push_back(myText);
+	}
+	MyText title = strCol("Equip: ", COL::White);
+	title += item->get_name();
+	int charHeight = title.get_charHeight();
 
-			if (i == highlightOpt)				
-			{
-				myText.set_color_first(sf::Color::Yellow);
-			}
-			else if ((BodyPart)i == bodypart || (bodypart == BodyPart::forHands && 
-				((BodyPart)i == BodyPart::rHand || (BodyPart)i == BodyPart::lHand)))
-			{
-				myText.set_color_first(sf::Color::White);
-			}
-			else
-			{
-				myText.set_color_first(MCOL::grey);
-			}
-			myText.window_draw(window);
-			y += CHAR_SIZE;
-		}
-		window->display();
+	int x = 400;
+	int y = 300;
+	int winLength = 600;
+	int winHeight = aviableOptIndexes.size() * (charHeight + 10) + 50;
+
+	UIWindow UIwin(winLength, winHeight, x, y, title, options, charHeight);
+	int bodyPartIndex = UIwin.call_window_return_choosen_indexes(window)[0];
+
+	bodyPartIndex = aviableOptIndexes[bodyPartIndex];
+	ret = static_cast<BodyPart>(bodyPartIndex);
+	return ret;
+}
 
 
-		input = user_input_key();
 
-		switch (input)
-		{
-		case '8':
-			highlightOpt--;
-			while (!((BodyPart)highlightOpt == bodypart || (bodypart == BodyPart::forHands &&
-				((BodyPart)highlightOpt == BodyPart::rHand || (BodyPart)highlightOpt == BodyPart::lHand))))
-			{
-				highlightOpt--;
-				highlightOpt = (highlightOpt == -1) ? (size - 1) : ((highlightOpt == size) ? 0 : highlightOpt);
-			}
-			break;
-		case '2':
-			highlightOpt++;
-			highlightOpt = (highlightOpt == -1) ? (size - 1) : ((highlightOpt == size) ? 0 : highlightOpt);
-			while (!((BodyPart)highlightOpt == bodypart || (bodypart == BodyPart::forHands &&
-				((BodyPart)highlightOpt == BodyPart::rHand || (BodyPart)highlightOpt == BodyPart::lHand))))
-			{
-				highlightOpt++;
-				highlightOpt = (highlightOpt == -1) ? (size - 1) : ((highlightOpt == size) ? 0 : highlightOpt);
-			}
-			break;
-		case '\n':
-		{
-			return (BodyPart)highlightOpt;
-		}
-		break;
-		default:
-			break;
-		}
+
+
+
+
+
+
+
+
+BodyPart UI::player_equipment_selector(const SharedPtr<Item>* eq)
+{
+	std::string optionsStr[BODY_PARTS_COUNT] = { "head   ", "body   ", "hands  ", "legs   ", "rHand  ", "lHand  " };
+	BodyPart ret;
+
+	MyText title = strCol("EQUIPMENT: ", MCOL::lawnGreen);
+	int charHeight = title.get_charHeight();
+
+	std::vector<MyText> options;
+	for (int i = 0; i < BODY_PARTS_COUNT; i++ )
+	{
+		myText.clear();		
+		myText = strCol(optionsStr[i], COL::White);
+		myText += (eq[i]) ? eq[i]->get_name() : strCol("none ", MCOL::grey);
+		options.push_back(myText);
 	}
 
+	int x = 200;
+	int y = 300;
+	int winLength = 800;
+	int winHeight = BODY_PARTS_COUNT * (CHAR_SIZE + 10);
+
+
+	UIWindow UIwin(winLength, winHeight, x, y, title, options, charHeight);
+	int bodyPartIndex = UIwin.call_window_return_choosen_indexes(window)[0];
+	ret = static_cast<BodyPart>(bodyPartIndex);
+	return ret;
+}
+
+
+
+
+int UI::equip_from_inv_selector(BodyPart bodyPartToEquip, const std::vector<SharedPtr<Item>>* inv)
+{
+	std::string bodyPartsStr[BODY_PARTS_COUNT] = { "head   ", "body   ", "hands  ", "legs   ", "rHand  ", "lHand  " };
+	MyText title = strCol("Equip to: ", COL::White);
+	title += strCol(bodyPartsStr[static_cast<int>(bodyPartToEquip)], COL::White);
+	int charHeight = title.get_charHeight();
+
+	std::vector<MyText> options;
+	for (const SharedPtr<Item> item : *inv) 
+	{
+		if (bodyPartToEquip == BodyPart::lHand || bodyPartToEquip == BodyPart::rHand)
+			if (item->get_bodyPart() == BodyPart::forHands)
+				options.push_back(item->get_name());
+		if (item->get_bodyPart() == bodyPartToEquip)
+			options.push_back(item->get_name());
+	}
+
+	int x = 100;
+	int y = 300;
+	int winLength = 600;
+	int winHeight = 400;
+
+	UIWindow UIwin(winLength, winHeight, x, y, title, options, charHeight);
+	int choosenIndex = UIwin.call_window_return_choosen_indexes(window)[0];
+	return choosenIndex;
 }

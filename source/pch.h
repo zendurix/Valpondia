@@ -11,6 +11,7 @@
 #include <chrono>
 #include <random>
 #include <utility>
+#include <numeric> 
 		  
 		  
 #include <SFML/Graphics.hpp>

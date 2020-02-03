@@ -13,8 +13,6 @@ MENU::~MENU()
 
 MENUoptions MENU::show_menu_ret_opt()
 {
-	GAME* game = GAME::getInstance();
-
 	text.setString
 	(
 		"     ---MENU--- \n"
@@ -38,7 +36,7 @@ MENUoptions MENU::show_menu_ret_opt()
 	
 	while(1)
 	{
-		option = user_input_key();
+		option = Input::user_input_key();
 		switch (option)
 		{
 		case '1':			return caveShow;
@@ -87,7 +85,7 @@ void MENU::show_controls()
 	windowHandle->draw(text);
 	windowHandle->display();
 
-	wait_for_input(space);
+	Input::wait_for_input(inputType::space);
 }
 
 void MENU::show_credits()
@@ -104,7 +102,7 @@ void MENU::show_credits()
 	windowHandle->draw(text);
 	windowHandle->display();
 
-	wait_for_input(space);
+	Input::wait_for_input(inputType::space);
 }
 
 

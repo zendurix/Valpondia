@@ -56,6 +56,8 @@ public:
 
 	void use();
 
+	useType get_type() { return type; }
+
 };
 
 

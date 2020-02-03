@@ -2,7 +2,6 @@
 #include "GAME_charControler.h"
 
 
-
 GAME_charControler::GAME_charControler(GAME* game)
 {
 	g = game;
@@ -62,7 +61,7 @@ void GAME_charControler::move_level_down(Character* ch)
 
 		g->levels[levelChange]->set_true_all_changedPrint(); ///////////////
 	}
-
+	FieldOfView::set_fieldArr(&g->levelActive->field);
 }
 
 void GAME_charControler::move_level_up(Character* ch)
@@ -81,38 +80,60 @@ void GAME_charControler::move_level_up(Character* ch)
 	ch->set_y(g->levels[levelChange]->stairsDown->get_y());
 	g->levels[levelChange]->field[ch->get_y()][ch->get_x()]->go_here(ch);
 	g->levels[levelChange]->set_true_all_changedPrint(); //////////////////////
+	FieldOfView::set_fieldArr(&g->levelActive->field);
 }
 
 char GAME_charControler::player_turn()
 {
-	char action = user_input_key();
+	char action = Input::user_input_key();
 
 	if (action >= '0' && action <= '9')
 	{
 		g->player->move(action);
 	}
-	else if (action == '+')
+	else
 	{
-		if (g->player->get_staysOn()->get_stairsUp())
-			move_level_up(g->player);
-	}
-	else if (action == '-')
-	{
-		if (g->player->get_staysOn()->get_stairsDown())
-			move_level_down(g->player);
-	}
-	else if (action == 'U')
-	{
-		g->Printer->print_field();
-		wait_for_input(space);
-	}
-	else if (action == 'p')
-	{
-		pick_up_item(g->player);
-	}
-	else if (action == 'i')
-	{
-		player_inventory_control();
+		// to duplicate game state on both windows - to avoid background to "UI's" windows flickering
+		g->Printer->print_field_UPDATE();
+
+		switch (action)
+		{
+			case '+':
+			{
+				if (g->player->get_staysOn()->get_stairsUp())
+					move_level_up(g->player);
+				break;
+			}
+			case '-':
+			{
+				if (g->player->get_staysOn()->get_stairsDown())
+					move_level_down(g->player);
+				break;
+			}
+			case 'U':
+			{
+				g->Printer->print_field();
+				Input::wait_for_input(inputType::space);
+				break;
+			}
+			case 'p':
+			{
+				pick_up_item(g->player);
+				break;
+			}
+			case 'i':
+			{
+				player_inventory_control();
+				break;
+			}
+			case 'e':
+			{
+				player_equipment_control();
+				break;
+			}
+			default:
+				break;
+		}
 	}
 
 	sleep_for_milliseconds(50);
@@ -149,7 +170,9 @@ void GAME_charControler::pick_up_item(Character* ch)
 	}
 	else
 	{
-		std::vector<SharedPtr<Item>> picked = UI::pick_items_window(items);
+		std::vector<int> pickedIndexes = UI::pickUp_items_selector(items);
+
+		std::vector<SharedPtr<Item>> picked = get_vect_items_from_indexes(*items, pickedIndexes);
 		for (SharedPtr<Item> item : picked)
 		{
 			ch->pick_item(item);
@@ -163,5 +186,72 @@ void GAME_charControler::pick_up_item(Character* ch)
 
 void GAME_charControler::player_inventory_control()
 {
-	UI::player_inventory_window();
+	int choosenIndex = 0;
+	const std::vector<SharedPtr<Item>>* inventory = g->player->get_inventory_ref();
+	while (choosenIndex != -1)
+	{
+		choosenIndex = UI::player_inventory_selector(inventory);
+
+		if (choosenIndex != -1)
+		{
+			item_options_control((*inventory)[choosenIndex]);
+		}
+	}
+}
+
+
+void GAME_charControler::player_equipment_control()
+{
+	const SharedPtr<Item>* eq = g->player->get_equipped_ref();
+	const std::vector<SharedPtr<Item>>* inv = g->player->get_inventory_ref();
+
+	BodyPart choosenBodyPart = UI::player_equipment_selector(eq);
+	int choosenEqIndex = static_cast<int>(choosenBodyPart);
+
+	if (choosenEqIndex != -1)
+	{
+		if (eq[choosenEqIndex] != nullptr)
+		{
+			item_options_control(eq[choosenEqIndex]);
+		}
+		else
+		{
+			int choosenInvIndex = UI::equip_from_inv_selector(choosenBodyPart, inv);
+			if (choosenInvIndex != -1)
+				g->player->equip_item((*inv)[choosenInvIndex], choosenBodyPart);			
+		}
+	}
+}
+
+void GAME_charControler::item_options_control(SharedPtr<Item> item)
+{
+	ItemOpt choosenOpt = UI::item_options_selector(item);
+
+	switch (choosenOpt)
+	{
+	case ItemOpt::look:
+		; // info about obj
+
+		break;
+	case ItemOpt::equip:
+	{
+		BodyPart bodypart = UI::choose_bodyPart_to_equip(item, g->player->get_equipped_ref());
+		g->player->equip_item(item, bodypart);
+		break;
+	}
+	case ItemOpt::unequip:
+	{
+		BodyPart bodypart = item->get_wornOnBodyPart();
+		g->player->un_equip_item(item, bodypart);
+		break;
+	}
+	case ItemOpt::drop:
+		if (item->get_isWorn())
+			g->player->un_equip_item(item, item->get_wornOnBodyPart());
+		g->player->drop_item(item);
+		break;
+	case ItemOpt::use:
+		// use
+		break;
+	}
 }

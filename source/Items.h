@@ -1,7 +1,5 @@
 #pragma once
 
-//#include "pch.h"
-
 #include "Item.h"
 
 
@@ -28,10 +26,10 @@ public:
 	// armors	
 
 	inline static const Item cardboardHelmet = Item(itemType::armor, BodyPart::head, itemMaterial::cardboard, 0, 0, MyText(strCol("helmet", COL::White)),
-		"", '[', false, Attack(0, 0), Attack(0, 0), Defend(0, 0));
+		"", '[', false, Attack(0, 0), Attack(0, 0), Defend(1, 0));
 
 	inline static const Item rubberTrousers = Item(itemType::armor, BodyPart::legs, itemMaterial::rubber, 4, 15, MyText(strCol("trousers", COL::White)),
-		"", '[', false, Attack(0, 0), Attack(0, 0), Defend(0, 0));
+		"", '[', false, Attack(0, 0), Attack(0, 0), Defend(3, 0));
 
 };
 

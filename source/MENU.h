@@ -1,6 +1,7 @@
 #pragma once
 
 #include "general_purpose_func.h"
+#include "Input.h"
 
 enum MENUoptions { placeHolder = 0, caveShow = 1, caveStep, dungShow, dungStep, gameSTART,
 					controls, credits, debugOPT, exitOPT};

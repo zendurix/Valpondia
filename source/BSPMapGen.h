@@ -16,6 +16,7 @@
 */
 
 #include "general_purpose_func.h"
+#include "MapFunctions.h"
 #include "Node.h"
 #include "Room.h"
 
@@ -36,8 +37,6 @@ private:
 	void RESET_field();
 	void color_map_white();
 
-
-
 	void split_map();
 
 	bool split_node(SharedPtr<Place> parentField, std::unique_ptr<Node> &parent, int level); //ret false if error
@@ -53,16 +52,9 @@ private:
 
 	void chceck_sizes(int levelmax, int MIN_SIZE);
 
-	
-
 public:
 
 	static std::vector<SharedPtr<Room>> make_dung_map_ret_rooms(Vector2D<SharedPtr<Place>> &field, int treeHeight);
-
-
-
-
-
 
 };
 

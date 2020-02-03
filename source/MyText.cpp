@@ -6,10 +6,11 @@
 std::string MyText::get_string() const
 {
 	std::string ret = "";
-	for (strCol str : texts)
+	for (int i = 0; i < texts.size(); i++)
 	{
-		ret += str.first;
-		ret += " ";
+		ret += texts[i].first;
+		if (i != texts.size()-1)
+			ret += " ";
 	}
 	return ret;
 }
@@ -31,14 +32,6 @@ MyText::MyText(std::vector<strCol> textVec, int size, int x, int y, sf::Font* fo
 
 	charLength = get_char_length(text);
 	charHeight = get_char_height(text);
-
-	if (STD_FONT == nullptr)
-	{
-		LOG_NEW;
-		STD_FONT = new sf::Font;
-		STD_FONT->loadFromFile("../SFML/sources/DOSfont.ttf");
-	}
-
 }
 MyText::MyText(strCol texCol, int size, int x, int y, sf::Font* font)
 	: font(font), charSize(size)
@@ -51,21 +44,15 @@ MyText::MyText(strCol texCol, int size, int x, int y, sf::Font* font)
 
 	charLength = get_char_length(text);
 	charHeight = get_char_height(text);
-
-	if (STD_FONT == nullptr)
-	{
-		LOG_NEW;
-		STD_FONT = new sf::Font;
-		STD_FONT->loadFromFile("../SFML/sources/DOSfont.ttf");
-	}
 }
 MyText::MyText() 
-{
+{	// call first to init STD_FONT
 	if (STD_FONT == nullptr)
 	{
 		LOG_NEW;
 		STD_FONT = new sf::Font;
 		STD_FONT->loadFromFile("../SFML/sources/DOSfont.ttf");
+		LOG("MyText STD_FONT loaded");
 	}
 }
 MyText::MyText(const MyText& copy)

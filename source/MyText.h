@@ -8,6 +8,10 @@
 // multicolor string to draw on sfml window
 
 
+
+typedef std::pair<std::string, sf::Color> strCol;
+
+
 class MyText
 {
 private:
@@ -37,9 +41,6 @@ public:
 	MyText();
 	~MyText();
 
-	
-
-
 
 
 	MyText& operator + (const strCol& addText); 
@@ -55,14 +56,15 @@ public:
 	// getters 
 	std::string get_string() const;
 	sf::Text get_text() const;
+	static sf::Font* get_STD_FONT()  { return STD_FONT; }
 	sf::Vector2f getPosition() const { return position; }
-	static sf::Font* get_STD_FONT() { return STD_FONT; }
 	int get_charLength()	   const { return charLength; }
+	int get_charHeight()	   const { return charHeight; }
 	MyTextVext get_texts()	   const { return texts; }
 	int getPosition_charSize() const { return charSize; }
 	COL get_color_first()	   const { return texts[0].second; }
 	
-	// my function naming convenction (function_name()) is broken here
+	// my function naming convenction (function_name()) is broken here (in setPosition)
 	// in purpose of MyText being similiar to sf::Text
 
 	// setters

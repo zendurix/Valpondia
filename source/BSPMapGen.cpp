@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "BspMapGen.h"
 
-// 370 linijek
 
 std::vector<SharedPtr<Room>> BspMapGen::make_dung_map_ret_rooms(Vector2D<SharedPtr<Place>> &fieldRef, int treeHeight)
 {
@@ -30,8 +29,9 @@ std::vector<SharedPtr<Room>> BspMapGen::make_dung_map_ret_rooms(Vector2D<SharedP
 	tree.fill_leaves_with_rooms(&rooms);
 	tree.connect_all_rooms();
 
-	#include "GAME.h"
-	GAME::getInstance()->Printer->print_field();
+	// TEST
+	//#include "GAME.h"
+	//GAME::getInstance()->Printer->print_field();
 
 	return rooms;
 }
@@ -212,11 +212,11 @@ SharedPtr<Room> BspMapGen::make_random_room_in_node(int nodeIndex)
 	int maxLength = nodes[nodeIndex]->length - PLACE_FOR_WALLS;
 	int maxHeight = nodes[nodeIndex]->height - PLACE_FOR_WALLS;
 
-	do
+	//do
 	{
 		length = random(MIN_ROOM_SIZE, maxLength);
 		height = random(MIN_ROOM_SIZE, maxHeight);
-	} while ((double)height / length < ROOM_WALLS_PROPORTION ||	(double)length / height < ROOM_WALLS_PROPORTION);
+	}// while ((double)height / length < ROOM_WALLS_PROPORTION ||	(double)length / height < ROOM_WALLS_PROPORTION);
 	
 	int parentX = nodes[nodeIndex]->fieldNode->get_x();
 	int parentY = nodes[nodeIndex]->fieldNode->get_y();

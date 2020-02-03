@@ -3,12 +3,10 @@
 
 #include "CONFIGURATION.h"
 #include "Place.h"
-#include "FieldOfView.h"
 
 
 
 
-enum inputType {any, space};
 
 std::ostream & operator << (std::ostream &stream, const sf::String& sfStr);
 
@@ -24,11 +22,9 @@ bool are_same_float(float a, float b);
 
 void sleep_for_milliseconds(int milliseconds);
 
-void wait_for_input(inputType input);
-
 sf::Text* init_text(int size = CHAR_SIZE);
 
-char user_input_key();
+
 
 
 
@@ -52,4 +48,13 @@ T vector_pop(std::vector<T> &vec, T elem)
 }
 
 
+
+template <typename T>
+std::vector<T> get_vect_items_from_indexes(std::vector<T> &vec, std::vector<int> indexes)
+{
+	std::vector<T> ret;
+	for (int i : indexes)
+		ret.push_back(vec.at(i));
+	return ret;
+}
 

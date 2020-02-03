@@ -13,13 +13,10 @@ using UniquePtr = std::unique_ptr<T>;
 // WINDOW SIZES
 const int MYHEIGHT = 50;  // y axis
 const int MYLENGTH = 60;  // x axis
-
 const int UI_LENGTH = 200;  // length from right border
-
 const int TILE_SIZE = 16; // in pixels
 const int WIN_HEIGHT = MYHEIGHT * TILE_SIZE;
 const int WIN_LENGTH = MYLENGTH * TILE_SIZE + UI_LENGTH;
-
 const int CHAR_SIZE = 32;  // size of text
 //
 
@@ -51,7 +48,8 @@ const int BODY_PARTS_COUNT = 6;
 //
 
 
-
+enum class Dir {up = '8', down = '2'};
+enum class ItemOpt { none = -1, look = 0, drop, equip, unequip, use };
 
 // for FoV and Gen Func
 static const float PI = 3.1415927f;

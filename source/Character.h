@@ -13,7 +13,8 @@ protected:
 	std::vector<std::vector<SharedPtr<Place> >> *fieldArr;
 	int onLevelID;
 
-	sf::String name;
+	std::string name;
+
 	sf::Sprite spriteChar;
 
 	bool moved,
@@ -29,6 +30,8 @@ protected:
 		  agility,
 		  inteligence,
 		  view;
+	short armorBasic,
+		  dodgeBonus;
 
 	float speed;
 	
@@ -53,18 +56,24 @@ public:
 	void un_equip_item(SharedPtr<Item> item, BodyPart part);
 
 
-// getters:
-	bool get_isAI() { return isAI; }
-	short get_x() { return posX; }
-	short get_y() { return posY; }
-	SharedPtr<Place>  get_staysOn() { return staysOn; }
-	char get_printFormat() { return printFormat; }
-	int get_view() { return view; }
-	int get_onLevelID() { return onLevelID; };
-	sf::Sprite get_spriteChar() { return spriteChar; }
 
-	std::vector< SharedPtr<Item>>* get_inventory_ref() { return &inventory; }
-	SharedPtr<Item>* get_equipped_ref() { return equipped; }
+
+// getters:
+	std::string get_name()				const { return name; }
+	int get_hpMax()						const { return hpMax; }
+	int get_hpLeft()					const { return hpLeft; }
+	bool get_isAI()						const { return isAI; }
+	short get_x()						const { return posX; }
+	short get_y()						const { return posY; }
+	SharedPtr<Place>  get_staysOn()		const { return staysOn; }
+	char get_printFormat()				const { return printFormat; }
+	int get_view()						const { return view; }
+	int get_onLevelID()					const { return onLevelID; };
+	sf::Sprite get_spriteChar()			const { return spriteChar; }
+	int get_armorBasic()				const { return armorBasic; }
+
+	const std::vector< SharedPtr<Item>>* get_inventory_ref() const  { return &inventory; }
+	const SharedPtr<Item>* get_equipped_ref()				 const { return equipped; }
 
 // setters:
 	void set_x(short set) { posX = set; }

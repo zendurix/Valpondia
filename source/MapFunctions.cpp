@@ -2,9 +2,9 @@
 #include "MapFunctions.h"
 
 
-void make_cave_map(bool testing, std::vector<std::vector<SharedPtr<Place> >> &fieldArr)
+void make_cave_map(bool testing, std::vector<std::vector<SharedPtr<Place> >> &fieldArray)
 {
-	CA_cave_gen cave(testing, fieldArr);
+	CA_cave_gen cave(testing, fieldArray);
 }
 
 /*
@@ -79,7 +79,7 @@ void make_room(std::string shape_name, int x, int y, int length1, int length2, S
 	*/
 
 	// upper wall
-	for (int i = 0; i < length1; i++)
+	for (int i = 0; i < (length1 + PLACE_FOR_WALLS / 2); i++)
 	{
 		field[y][x]->make_wall();
 		field[y][x]->set_printFormat(196);
@@ -100,11 +100,11 @@ void make_room(std::string shape_name, int x, int y, int length1, int length2, S
 		field[y][x]->set_roomHere(room);
 		x++;
 	}
-	y = startY + length2;
+	y = startY + length2 + PLACE_FOR_WALLS/2;
 	x = startX;	
 
 	// down wall
-	for (int i = 0; i < length1; i++)
+	for (int i = 0; i < (length1 + PLACE_FOR_WALLS / 2); i++)
 	{
 		field[y][x]->make_wall();
 		field[y][x]->set_printFormat(196);
@@ -126,7 +126,7 @@ void make_room(std::string shape_name, int x, int y, int length1, int length2, S
 		x++;
 	}
 	x = startX;
-	y = startY;
+	y = startY + PLACE_FOR_WALLS / 2;
 
 	// left wall
 	for (int i = 0; i < length2; i++)
@@ -139,7 +139,7 @@ void make_room(std::string shape_name, int x, int y, int length1, int length2, S
 		y++;
 	}
 	x = startX + length1;
-	y = startY;
+	y = startY + PLACE_FOR_WALLS / 2;
 
 	//right wall
 	for (int i = 0; i < length2; i++)
@@ -167,9 +167,7 @@ void make_room(std::string shape_name, int x, int y, int length1, int length2, S
 		x = startX + 1;
 		y++;
 	}
-	room->calculate_sizes();
-
-	
+	room->calculate_sizes();	
 }
 
 

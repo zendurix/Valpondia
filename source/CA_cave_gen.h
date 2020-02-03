@@ -4,6 +4,8 @@
 
 
 #include "CONFIGURATION.h"
+
+#include "Input.h"
 #include "Place.h"
 #include "RNG.h"
 #include "GAME.h" 

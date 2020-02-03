@@ -26,7 +26,7 @@ CA_cave_gen::CA_cave_gen(bool testing, std::vector<std::vector<SharedPtr<Place> 
 				set_map(fieldArr);
 				game->Printer->print_field();
 				LOG("CA step: " << i);
-				wait_for_input(space);
+				Input::wait_for_input(inputType::space);
 			}
 
 			if (i < STEP_LIMIT)

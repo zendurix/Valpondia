@@ -14,36 +14,15 @@ void Character::move(char direction)
 	SharedPtr<Place>  fieldPrev = (*fieldArr)[posY][posX];
 	switch (direction)
 	{
-	case '8':
-		posY--;
-		break;
-	case '9':
-		posY--;
-		posX++;
-		break;
-	case '6':
-		posX++;
-		break;
-	case '3':
-		posY++;
-		posX++;
-		break;
-	case '2':
-		posY++;
-		break;
-	case '1':
-		posY++;
-		posX--;
-		break;
-	case '4':
-		posX--;
-		break;
-	case '7':
-		posY--;
-		posX--;
-		break;
-	case '5':    // '5' is for wait one turn
-		break;
+	case '8':	posY--;				break;	
+	case '9':	posY--;  posX++;	break;
+	case '6':			 posX++;	break;
+	case '3':	posY++;  posX++;	break;
+	case '2':	posY++;				break;
+	case '1':	posY++;	 posX--;	break;
+	case '4':			 posX--;	break;
+	case '7':	posY--;  posX--;	break;
+	case '5':						break;	 /*'5' is for wait one turn*/	
 	}
 
 	if (posX < 0) posX = 0;
@@ -135,6 +114,13 @@ void Character::equip_item(SharedPtr<Item> item, BodyPart part)
 		equipped[(int)part] = item;
 	}
 	vector_pop2(inventory, item);
+
+	item->set_wornOnBodyPart(part);
+	item->set_isWorn(true);
+
+	armorBasic += item->defend.get_baseArmor();
+	dodgeBonus += item->defend.get_dodgeValue();
+
 }
 
 void Character::un_equip_item(SharedPtr<Item> item, BodyPart part)
@@ -150,4 +136,11 @@ void Character::un_equip_item(SharedPtr<Item> item, BodyPart part)
 		inventory.push_back(item);
 		equipped[(int)part] = nullptr;
 	}
+
+	armorBasic -= item->defend.get_baseArmor();
+	dodgeBonus -= item->defend.get_dodgeValue();
+
+	item->set_isWorn(false);
+	item->set_wornOnBodyPart(BodyPart::none);
 }
+

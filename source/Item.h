@@ -32,6 +32,7 @@ private:
 	int value;
 
 	bool isWorn;
+	BodyPart wornOnBodyPart;
 
 	std::string flavorText;
 	MyText name; 
@@ -60,15 +61,19 @@ public:
 	Use    use;
 
 
-	// getter
-	bool get_isWorn()		const { return isWorn; }
-	MyText get_name()		const { return name; }
-	itemType get_type()		const { return type; }
-	BodyPart get_bodyPart() const { return bodyPart; }
-	bool get_twohand()   const { return twoHand; }
+	// getters
+	bool get_isWorn()				const { return isWorn; }
+	MyText get_name()				const { return name; }
+	itemType get_type()				const { return type; }
+	BodyPart get_bodyPart()			const { return bodyPart; }
+	BodyPart get_wornOnBodyPart()	const { return wornOnBodyPart; }
+	bool get_twohand()				const { return twoHand; }
 
 
-	// setters:
-	void set_name(MyText set)	{ name = set; }
+	// setters
+	void set_name(MyText set)				{ name = set; }
+	void set_isWorn(bool set)				{ isWorn = set; }
+	void set_bodyPart(BodyPart set)			{ bodyPart = set; }
+	void set_wornOnBodyPart(BodyPart set)	{ wornOnBodyPart = set; }
 };
 
