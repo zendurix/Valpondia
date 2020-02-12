@@ -9,8 +9,8 @@
 class PathFinding
 {
 public:
-	static char best_dir(Character character, SharedPtr<Place>);
-	static void set_fieldRef(Vector2D<SharedPtr<Place>> *field) { fieldRef = field; }
+	static char best_dir(Vector2D<SharedPtr<Place>> *field, Character character, SharedPtr<Place>);
+	//static void set_fieldRef() { fieldRef = field; }
 
 private:
 	struct AstarNode

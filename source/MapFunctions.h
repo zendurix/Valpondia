@@ -1,21 +1,25 @@
 #pragma once
 
-#include "CA_cave_gen.h"
-//#include "BSPMapGen.h"
 #include "Room.h"
 #include "GAME.h"
 #include "general_purpose_func.h"
+#include "Level.h"
+
+class Level;
+
+
+void make_room(Vector2D<SharedPtr<Place>>& field, int x, int y, int length1, int length2, SharedPtr <Room> room, bool ruin = false);
+
+void make_whole_map_obstacle(Vector2D<SharedPtr<Place>>& field);
+void make_whole_map_not_obstacle(Vector2D<SharedPtr<Place>>& field);
+
+
+void load_map_from_file(Level& level, std::string fileName);
+
+
+void make_map_ruins(Level& level);
 
 
 
-void make_cave_map(bool testing, std::vector<std::vector<SharedPtr<Place> >> &fieldArray);
-
-//td::vector <SharedPtr <Room>> make_dung_map_ret_rooms(bool test);
-
-void make_room(std::string shape_name, int x, int y, int length1, int length2, SharedPtr <Room> room);
-
-void make_whole_map_obstacle();
-void make_whole_map_not_obstacle();
-
-
-
+bool zonesOverlaps(std::vector<SharedPtr<Place>> zone1, std::vector<SharedPtr<Place>> zone2);
+bool overlapOtherRoom(Vector2D<SharedPtr<Place>>& field, std::vector<SharedPtr<Place>> zone);

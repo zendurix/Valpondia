@@ -21,6 +21,7 @@ private:
 	MyText title;
 	MyText myText;
 
+	bool interactive;
 	bool fitWindow;
 	bool addTickBoxes;
 	sf::RectangleShape tickBox;
@@ -51,6 +52,7 @@ public:
 	std::vector<int> call_window_return_choosen_indexes(sf::RenderWindow* win);
 
 	void add_tickBoxes();
+	void set_interactive(bool set) { interactive = set; }
 
 
 

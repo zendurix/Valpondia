@@ -2,14 +2,18 @@
 #include "Character.h"
 
 
+void Character::set_staysOn (SharedPtr<Place> set)
+{ staysOn = set; this->set_x(set->get_x()); this->set_y(set->get_y()); }
+
+
 void Character::loadTexture(sf::Sprite sprite)
 {
 	spriteChar = sprite;
 }
 
-void Character::move(char direction)
+Character* Character::move_and_attack(char direction)
 {
-	SharedPtr<Place>  field;
+	SharedPtr<Place>  goingTo;
 	short prevX = posX, prevY = posY;
 	SharedPtr<Place>  fieldPrev = (*fieldArr)[posY][posX];
 	switch (direction)
@@ -30,37 +34,106 @@ void Character::move(char direction)
 	if (posX == MYLENGTH) posX = MYLENGTH - 1;
 	if (posY == MYHEIGHT) posY = MYHEIGHT - 1;
 
-	field = (*fieldArr)[posY][posX];
+	goingTo = (*fieldArr)[posY][posX];
 
 	if (prevX != posX || prevY != posY)
 	{
-		if (!field->get_isObstacle())
-		{
-			staysOn = field;
-			field->go_here(this);
-			fieldPrev->leave_here();
-			moved = true;
-		}
-		else
+		if (goingTo->get_isObstacle())
 		{
 			posX = prevX;
 			posY = prevY;
 			fieldPrev->go_here(this);
 			moved = true;
 		}
+		else if (goingTo->get_characterHere() != nullptr)
+		{
+			posX = prevX;
+			posY = prevY;
+			fieldPrev->go_here(this);
+			moved = true;
+			return goingTo->get_characterHere();
+		}
+		else
+		{
+			staysOn = goingTo;
+			goingTo->go_here(this);
+			fieldPrev->leave_here();
+			moved = true;
+		}
 	}
+	return nullptr;
 }
 
-void Character::attack_character(Character* target)
+DMG Character::do_attack()
 {
-	int dmg = attack;
-	target->take_damage(dmg);
+	DMG dmg = { 0, 0, 0 };
+	if (equipped[static_cast<int>(BodyPart::rHand)] != nullptr)
+	{
+		dmg.baseDMG += equipped[static_cast<int>(BodyPart::rHand)]->melee.hit_baseDMG();
+		dmg.fireDMG += equipped[static_cast<int>(BodyPart::rHand)]->melee.hit_fireDMG();
+		dmg.penetration = equipped[static_cast<int>(BodyPart::rHand)]->melee.hit_penetration();
+	}
+	if (equipped[static_cast<int>(BodyPart::lHand)] != nullptr)
+	{
+		dmg.baseDMG += equipped[static_cast<int>(BodyPart::lHand)]->melee.hit_baseDMG();
+		dmg.fireDMG += equipped[static_cast<int>(BodyPart::lHand)]->melee.hit_fireDMG();
+		dmg.penetration = equipped[static_cast<int>(BodyPart::lHand)]->melee.hit_penetration();
+	}
+
+	if (equipped[static_cast<int>(BodyPart::lHand)] != nullptr && equipped[static_cast<int>(BodyPart::rHand)] != nullptr)
+		dmg.penetration = (equipped[static_cast<int>(BodyPart::rHand)]->melee.hit_penetration() +
+						   equipped[static_cast<int>(BodyPart::lHand)]->melee.hit_penetration()) / 2;
+
+	strength = 1;
+
+	dmg.penetration += strength;
+
+	return dmg;
+}
+
+
+DEF Character::do_defend()
+{
+	DEF def = { 0, 0 };
+	for (SharedPtr<Item> item : equipped)
+	{
+		if (item != nullptr)
+		{
+			def.baseDEF += item->defend.def_baseArmor();
+			def.fireDEF += item->defend.def_fireArmor();
+		}
+	}
+
+	// + bonuses
+
+	return def;	 
+}
+
+
+bool Character::do_dodge()
+{
+	agility = 2;
+	int dodge = 0;
+	dodge += agility;
+
+	for (SharedPtr<Item> item : equipped)
+	{
+		if (item != nullptr)
+			dodge += item->defend.get_dodgeValue();
+	}
+
+	// + bonus for not heav inventory
+
+	dodge *= 2;
+
+	bool dodged = (random(0, 100) <= dodge);
+
+	return dodged;
 }
 
 void Character::take_damage(int damage)
 {
-	int damageDone = damage;
-	hpLeft -= damageDone;
+	hpLeft -= damage;
 	if (hpLeft <= 0)
 		DIE();
 }
@@ -118,7 +191,7 @@ void Character::equip_item(SharedPtr<Item> item, BodyPart part)
 	item->set_wornOnBodyPart(part);
 	item->set_isWorn(true);
 
-	armorBasic += item->defend.get_baseArmor();
+	armorBasic += item->defend.def_baseArmor();
 	dodgeBonus += item->defend.get_dodgeValue();
 
 }
@@ -137,7 +210,7 @@ void Character::un_equip_item(SharedPtr<Item> item, BodyPart part)
 		equipped[(int)part] = nullptr;
 	}
 
-	armorBasic -= item->defend.get_baseArmor();
+	armorBasic -= item->defend.def_baseArmor();
 	dodgeBonus -= item->defend.get_dodgeValue();
 
 	item->set_isWorn(false);

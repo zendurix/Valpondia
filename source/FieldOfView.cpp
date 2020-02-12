@@ -4,8 +4,9 @@
 
 
 
-void FieldOfView::update_view(SharedPtr<Place> placeChar)
+void FieldOfView::update_view(Vector2D<SharedPtr<Place>> *field, SharedPtr<Place> placeChar)
 {
+	fieldArr = field;
 	std::thread qrt1(update_1qrt, placeChar);
 	std::thread qrt2(update_2qrt, placeChar);
 	std::thread qrt3(update_3qrt, placeChar);
@@ -70,6 +71,9 @@ void FieldOfView::tracer(SharedPtr<Place>  startPoint, float angle, int distance
 		{
 			tracer = step_tracer(tracer, quarter, '|');
 			stepCounter++;
+			if (tracer->get_x() == 0 || tracer->get_x() == MYLENGTH - 1 ||
+				tracer->get_y() == 0 || tracer->get_y() == MYHEIGHT - 1)
+				break;
 		}
 	}
 
@@ -99,8 +103,17 @@ void FieldOfView::tracer(SharedPtr<Place>  startPoint, float angle, int distance
 			tracer = step_tracer(tracer, quarter, '-');
 			stepCounter++;
 		}
+
+		if (tracer->get_x() == 0 || tracer->get_x() == MYLENGTH - 1 ||
+			tracer->get_y() == 0 || tracer->get_y() == MYHEIGHT - 1)
+			break;
 	}
 	tracer->make_visible();
+
+
+
+
+
 }
 
 

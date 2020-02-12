@@ -55,7 +55,7 @@ sf::Text* init_text(int size)
 	LOG_NEW;
 	sf::Font* font = new sf::Font;
 	LOG_NEW;
-	font->loadFromFile("../SFML/sources/DOSfont.ttf");
+	font->loadFromFile("../res/fonts/DOSfont.ttf");
 	text->setFont(*font);
 	text->setCharacterSize(size);
 	text->setFillColor(sf::Color::White);

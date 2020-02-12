@@ -2,9 +2,16 @@
 #include "CA_cave_gen.h"
 
 
-CA_cave_gen::CA_cave_gen(bool testing, std::vector<std::vector<SharedPtr<Place> >> &fieldArr)
+
+void CA_cave_gen::make_cave_map(Vector2D<SharedPtr<Place>>& fieldArray, bool testing)
 {
-	GAME *game = GAME::getInstance();
+	CA_cave_gen cave(fieldArray, testing);
+}
+
+
+
+CA_cave_gen::CA_cave_gen(Vector2D<SharedPtr<Place>>& fieldArr, bool testing)
+{
 	for (int i = 0; i < MYHEIGHT; i++)
 	{
 		for (int j = 0; j < MYLENGTH; j++)
@@ -21,10 +28,10 @@ CA_cave_gen::CA_cave_gen(bool testing, std::vector<std::vector<SharedPtr<Place> 
 
 		for (int i = 0; i <= STEP_LIMIT+1; i++)
 		{
-			if (testing)
+			if (testing) // dont use for now
 			{
 				set_map(fieldArr);
-				game->Printer->print_field();
+				//game->Printer->print_field();
 				LOG("CA step: " << i);
 				Input::wait_for_input(inputType::space);
 			}
@@ -141,7 +148,7 @@ int CA_cave_gen::count_neighbours(int y, int x)
 }
 
 void CA_cave_gen::set_map(std::vector<std::vector<SharedPtr<Place> >> &fieldArr)
-{
+{ 
 	for (int i = 0; i < MYHEIGHT; i++)
 		for (int j = 0; j < MYLENGTH; j++)
 		{

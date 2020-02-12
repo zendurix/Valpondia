@@ -4,9 +4,9 @@
 #include "Place.h"
 #include "GAME.h"
 #include "BSPMapGen.h"
-//#include "MapFunctions.h"
+#include "CA_cave_gen.h"
 
-enum lvType { cave = 0, dungeon };
+
 
 class Level
 {
@@ -14,10 +14,11 @@ class Level
 	friend class GAME_charControler;
 
 private:
-	static int levelCount;
+	inline static int levelCount = -1;
 	lvType  levelType;
 	int depth;
 	int levelID;
+	std::string mapFileName;
 
 	SharedPtr<Place>  stairsUp;
 	SharedPtr<Place>  stairsDown;
@@ -30,7 +31,7 @@ private:
 public:
 	Vector2D<SharedPtr<Place>> field; //vector equivalent of  Place field[MYHEIGHT][MYLENGTH];
 
-	Level(lvType p_levelType, int depthLevel, SharedPtr<Place>  stairsDown);
+	Level(lvType p_levelType, int depthLevel, SharedPtr<Place>  stairsDownm, std::string fileName = "");
 	~Level();
 
 	bool isPlaceForStairsUp();
@@ -39,11 +40,19 @@ public:
 	void set_true_all_changedPrint();
 	void RESET_field();
 
+	std::vector<SharedPtr<CharacterEnemy>> fill_with_monsters();
+
 
 // getters:
 	int getDepth()						const  { return depth; };
 	SharedPtr<Place>  get_stairsDown()	const  { return stairsDown; };
 	SharedPtr<Place>  get_stairsUp()	const  { return stairsUp; };
 	static int getLevelCount()			 { return levelCount; };
+
+// setters
+	void  set_stairsDown(SharedPtr<Place> set)	{ stairsDown = set; };
+	void  set_stairsUp(SharedPtr<Place> set)	{ stairsUp = set; };
+
+
 };
 

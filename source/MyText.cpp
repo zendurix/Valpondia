@@ -51,8 +51,8 @@ MyText::MyText()
 	{
 		LOG_NEW;
 		STD_FONT = new sf::Font;
-		STD_FONT->loadFromFile("../SFML/sources/DOSfont.ttf");
-		LOG("MyText STD_FONT loaded");
+		STD_FONT->loadFromFile("../res/fonts/DOSfont.ttf");
+		LOG("MyText STD_FONT....................loaded");
 	}
 }
 MyText::MyText(const MyText& copy)

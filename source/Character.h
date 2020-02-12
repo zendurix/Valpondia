@@ -4,7 +4,27 @@
 #include "Place.h"
 #include "Item.h"
 
+
 class Place;
+
+
+struct DMG
+{
+	int baseDMG;
+	int fireDMG;
+	// and many other DMG types
+
+	int penetration;
+};
+
+struct DEF
+{
+	int baseDEF;
+	int fireDEF;
+};
+
+
+
 
 
 class Character
@@ -26,7 +46,7 @@ protected:
 
 	short hpMax,
 		  hpLeft,
-		  attack,
+		  strength,
 		  agility,
 		  inteligence,
 		  view;
@@ -44,8 +64,12 @@ public:
 
 	void loadTexture(sf::Sprite sprite);
 
-	void move(char direction);
-	void attack_character(Character* target);
+	Character* move_and_attack(char direction);
+
+	DMG do_attack();
+	DEF do_defend();
+	bool do_dodge();
+
 	void take_damage(int damage);
 	void virtual DIE();
 
@@ -78,10 +102,17 @@ public:
 // setters:
 	void set_x(short set) { posX = set; }
 	void set_y(short set) { posY = set; }
-	void set_staysOn(SharedPtr<Place>  set) { staysOn = set; }
+	void set_staysOn(SharedPtr<Place> set);
 	void set_printFormat(char set) { printFormat = set; }
 	void set_onLevelID(int set) { onLevelID = set; }
 	sf::Sprite set_spriteChar(sf::Sprite set) { spriteChar = set; }
+	void set_hpMax(short set)		{ hpMax = set; }
+	void set_hpLeft(short set)		{ hpLeft = set; }
+	void set_strength(short set)	{ strength = set; }
+	void set_agility(short set)		{ agility = set; }
+	void set_inteligence(short set) { inteligence = set; }
+	void set_view(short set)		{ view = set; }
+
 
 	void set_fieldArr(std::vector<std::vector<SharedPtr<Place> >> *field) { fieldArr = field; }
 };

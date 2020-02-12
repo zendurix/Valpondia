@@ -1,14 +1,15 @@
 #include "pch.h"
 #include "Level.h"
 
-int Level::levelCount = -1;
 
-Level::Level(lvType p_levelType, int depthLevel, SharedPtr<Place>  stairsDown)
+
+Level::Level(lvType p_levelType, int depthLevel, SharedPtr<Place>  stairsDown, std::string fileName)
+	: mapFileName(fileName)
 {
 	levelCount++;
 	init_field();
 	depth = depthLevel;
-	levelID = depthLevel;
+	levelID = levelCount;
 	levelType = p_levelType;
 	prevStairsDown = stairsDown;
 }
@@ -41,23 +42,37 @@ void Level::make_level()
 {
 	do
 	{
-		if (levelType == cave)
+		if (levelType == ruins)
 		{
-			make_cave_map(false, field);
+			make_map_ruins(*this);
+		}
+		else if (levelType == cave)
+		{
+			CA_cave_gen::make_cave_map(field);
 		}
 		else if (levelType == dungeon)
 		{
 			rooms =	BspMapGen::make_dung_map_ret_rooms(field, MAX_LEVEL);
 		}
+		else if (levelType == fromFile)
+		{
+			load_map_from_file(*this, mapFileName);
+		}
 		
 	} while (!isPlaceForStairsUp());
 
-	if(depth != 0)
+	if (depth != 0)
 	{
 		field[prevStairsDown->get_y()][prevStairsDown->get_x()]->set_stairsUp(true);
 		stairsUp = field[prevStairsDown->get_y()][prevStairsDown->get_x()];
 	}
 }
+
+
+
+
+
+
 
 bool Level::isPlaceForStairsUp()
 {
@@ -90,16 +105,17 @@ void Level::changeLevelType(lvType levelType)
 	rooms.clear();
 	switch (levelType)
 	{
+	case ruins:
+		RESET_field();
+		make_map_ruins(*this);
+		break;
 	case cave:
-		make_cave_map(false, field);
+		CA_cave_gen::make_cave_map(field);
 		break;
 	case dungeon:
 		rooms = BspMapGen::make_dung_map_ret_rooms(field, MAX_LEVEL);
 		break;
 	}
-	stairsDown->set_stairsDown(false);
-
-	place_stairsDown_random();
 }
 
 void Level::place_stairsDown_random()
@@ -133,7 +149,23 @@ void Level::RESET_field()
 			x->RESET();
 		}
 	}
+
+	stairsDown->set_stairsDown(false);
 }
 
 
 
+std::vector<SharedPtr<CharacterEnemy>> Level::fill_with_monsters()
+{
+	switch (levelType)
+	{
+	case (dungeon):
+	{
+
+	}
+
+
+	}
+
+	   
+}

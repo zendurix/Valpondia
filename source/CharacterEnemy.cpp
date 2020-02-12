@@ -2,6 +2,53 @@
 #include "CharacterEnemy.h"
 
 
+SharedPtr<CharacterEnemy> CharacterEnemy::make_enemy(EnemyType type, short x, short y, std::vector<std::vector<SharedPtr<Place> >> *field)
+{
+	SharedPtr<CharacterEnemy> enemy = std::make_shared<CharacterEnemy>(x, y, field);
+
+	switch (type)
+	{
+	case rat:
+	{	// yeah this is kinda RPG, so there must be rats
+
+		enemy->set_hpMax(4);
+		enemy->set_hpLeft(4);
+		enemy->set_strength(1);
+		enemy->set_agility(3);
+		enemy->set_inteligence(1);
+		enemy->set_view(10);
+
+
+
+
+
+
+
+
+
+	}
+
+		break;
+
+
+
+
+
+
+	}
+
+
+
+
+
+
+}
+
+
+
+
+
+
 
 
 CharacterEnemy::CharacterEnemy(short x, short y, std::vector<std::vector<SharedPtr<Place> >> *field)
@@ -13,6 +60,13 @@ CharacterEnemy::CharacterEnemy(short x, short y, std::vector<std::vector<SharedP
 	isAlive = true;
 	printFormat = '@';
 	isAlive = true;
+
+
+
+	hpMax = 10;
+	hpLeft = 10;
+
+
 
 	fieldArr = field;
 
@@ -42,9 +96,9 @@ void CharacterEnemy::follow_target_Astar(SharedPtr<Place> target)
 	char moveDir = '5';
 	if (distance_meter(*this->get_staysOn(), *target) > 2.0)
 	{
-		moveDir = PathFinding::best_dir(*this, target);
+		moveDir = PathFinding::best_dir(fieldArr, *this, target);
 	}
-	move(moveDir);
+	move_and_attack(moveDir);
 }
 
 
@@ -91,7 +145,7 @@ void CharacterEnemy::follow_target_shortest_way(SharedPtr<Place> target)
 			dir = directions[bestDistanceID];
 		}
 
-		move(dir);
+		move_and_attack(dir);
 	}
 }
 

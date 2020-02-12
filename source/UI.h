@@ -49,6 +49,8 @@ private:
 	static int center_text_posX(MyText text, int centeringLength = WIN_LENGTH);
 	static int center_text_posY(sf::Text text, int centeringHeight = WIN_HEIGHT);
 
+	static void get_item_info_texts(const SharedPtr<Item> item, MyText& dmg, MyText& armor, MyText& dodge, MyText& name, MyText& flavortext);
+
 // private
 
 public:
@@ -69,5 +71,8 @@ public:
 	static ItemOpt item_options_selector(const SharedPtr<Item> item);
 
 	static int equip_from_inv_selector(BodyPart bodyPartToEquip, const std::vector<SharedPtr<Item>>* inventory);
+
+	static void show_item_info(const SharedPtr<Item> item);
+
 };
 

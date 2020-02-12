@@ -16,7 +16,7 @@ public:
 	static void init_Input(sf::RenderWindow* window) 
 	{ 
 		winPtr = window;
-		LOG("Input initialized");
+		LOG("Input..............................initialized");
 	}
 
 	static char user_input_key();

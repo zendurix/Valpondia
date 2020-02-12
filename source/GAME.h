@@ -16,15 +16,35 @@ class Level;
 class Node;
 class GAME_Printer;
 class GAME_charControler;
+class MENU;
 
 class GAME
 {
+	friend class GAME_Printer;
+	friend class GAME_charControler;
+
+	friend int main(); // temporary
+	friend class MENU; // tempoorary
+	friend bool MENU_handler_ret_startGame(GAME* game, MENU menu, bool* exit);	 // temporary
+	friend void MENU_DEBUG_handler(GAME* game, MENU menu);						 // tempoorary
+
+
+
 private:
 	static GAME* instance;
 	GAME();
 	~GAME();
 
-	void init_components();
+	void init_components();	
+
+	sf::RenderWindow* windowHandle;
+
+	CharacterPlayer* player;
+	Vector2D<SharedPtr<CharacterEnemy>> enemiesByLevels;
+
+	std::vector <Level*> levels;
+	Level* levelActive;
+	int levelActiveId;
 
 
 public:	
@@ -35,18 +55,14 @@ public:
 	GAME_Printer* Printer;
 	GAME_charControler* CharControler;
 
-	sf::RenderWindow* windowHandle;	
 
-	CharacterPlayer* player;
-
-	std::vector <Level*> levels;
-	Level* levelActive;
-	short levelActiveId;
 	
 	void setWindow(sf::RenderWindow* windowPtr);
-	void make_new_level(enum lvType levelType);
+	void make_all_levels();
 	void RESET_levels();
 	void unmake_visible_whole_level();
+
+	void make_level(Connector connector);
 
 
 
@@ -57,5 +73,8 @@ public:
 		reset_visibility(character);
 		reset_visibility(args...);
 	}
+
+
+
 };
 

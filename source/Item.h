@@ -34,7 +34,7 @@ private:
 	bool isWorn;
 	BodyPart wornOnBodyPart;
 
-	std::string flavorText;
+	MyText flavorText;
 	MyText name; 
 
 	BodyPart bodyPart;
@@ -48,7 +48,7 @@ public:
 	char printFormat;
 
 	Item(itemType Ittype, BodyPart bodypart, itemMaterial Itmaterial, int Itweight, int Itvalue, 
-		MyText name = strCol("", COL::White), std::string text = "", char printForm = ' ', bool twohand = false,
+		MyText name = strCol("", COL::White), MyText text = strCol("", COL::White), char printForm = ' ', bool twohand = false,
 		Attack mele = Attack(), Attack rang = Attack(), Defend def = Defend(), Use us = Use() );
 	~Item();
 
@@ -64,6 +64,7 @@ public:
 	// getters
 	bool get_isWorn()				const { return isWorn; }
 	MyText get_name()				const { return name; }
+	MyText get_flavorText()			const { return flavorText; }
 	itemType get_type()				const { return type; }
 	BodyPart get_bodyPart()			const { return bodyPart; }
 	BodyPart get_wornOnBodyPart()	const { return wornOnBodyPart; }
@@ -72,6 +73,7 @@ public:
 
 	// setters
 	void set_name(MyText set)				{ name = set; }
+	void set_flavorText(MyText set)			{ flavorText = set; }
 	void set_isWorn(bool set)				{ isWorn = set; }
 	void set_bodyPart(BodyPart set)			{ bodyPart = set; }
 	void set_wornOnBodyPart(BodyPart set)	{ wornOnBodyPart = set; }

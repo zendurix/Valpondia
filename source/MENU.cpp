@@ -13,43 +13,86 @@ MENU::~MENU()
 
 MENUoptions MENU::show_menu_ret_opt()
 {
-	text.setString
-	(
-		"     ---MENU--- \n"
-		" 1 - make random cave map \n"
-		" 2 - make random cave map with steps \n"
-		"     (press space to go to next step)\n"
-		" 3 - make random dungeon map \n"
-		" 4 - make random dungeon map with steps\n"
-		" 5 - test Field Of View on random cave map (play game)\n"
-		" 6 - controls \n"
-		" 7 - credits \n"
-		" 8 - DEBUG OPTIONS \n"
-		" space in game - go back to menu \n"
-		" ESC - exit game\n"
-	);
-	windowHandle->clear();
-	windowHandle->draw(text);
-	windowHandle->display();
-
-	char option;
-	
-	while(1)
+	if (DEBUG_MENU)
 	{
-		option = Input::user_input_key();
-		switch (option)
+		text.setString
+		(
+			"     ---MENU--- \n"
+			" 1 - make random cave map \n"
+			" 2 - make random dungeon map \n"
+			" 3 - NEW GAME\n"
+			" 4 - controls \n"
+			" 5 - credits \n"
+			" 6 - DEBUG OPTIONS \n"
+			" space in game - go back to menu \n"
+			" ESC - exit game\n"
+		);
+		windowHandle->clear();
+		windowHandle->draw(text);
+		windowHandle->display();
+
+		char option;
+
+		while(1)
 		{
-		case '1':			return caveShow;
-		case '2':			return caveStep;
-		case '3':			return dungShow;
-		case '4':			return dungStep;
-		case '5':			return gameSTART;
-		case '6':			return controls;
-		case '7':			return credits;
-		case '8':			return debugOPT;
-		case STD_ESC:		return exitOPT;
-		default:			return placeHolder;
+			option = Input::user_input_key();
+			switch (option)
+			{
+			case '1':			return caveShow;
+			case '2':			return dungShow;
+			case '3':			return gameSTART;
+			case '4':			return controls;
+			case '5':			return credits;
+			case '6':			return debugOPT;
+			case STD_ESC:		return exitOPT;
+			default:			return placeHolder;
+			}
 		}
+	}
+
+	else // Better looking menu
+	{
+		std::vector<MyText> options =
+		{
+			strCol("make random cave map", sf::Color::White),
+			strCol("make random cave map with steps", sf::Color::White),
+			//strCol("  (press space to go to next step)", sf::Color::White),
+			strCol("make random dungeon map", sf::Color::White),
+			strCol("make random dungeon map with steps (DELETED)", sf::Color::White),
+			strCol("test Field Of View on random cave map (play game)", sf::Color::White),
+			strCol("controls", sf::Color::White),
+			strCol("credits", sf::Color::White),
+			strCol("DEBUG OPTIONS ", sf::Color::White),
+			strCol(" space in game - go back to menu", sf::Color::White),
+			strCol(" ESC - exit game", sf::Color::White)
+		};
+		MyText title = strCol("     ---MENU--- \n", MCOL::hotPink);
+
+		int x = 0;
+		int y = 0;
+		int winLength = WIN_LENGTH;
+		int winHeight = WIN_HEIGHT;
+		int charHeight = title.get_charHeight();
+
+		UIWindow UIwin(winLength, winHeight, x, y, title, options, charHeight, false, 10);
+
+		while (1)
+		{
+			// UIwin ret 0 as first, but here 1 is first
+			int choosenOpt = UIwin.call_window_return_choosen_indexes(windowHandle)[0] + 1;
+			switch (choosenOpt)
+			{
+			case   1:	return caveShow;
+			case   2:	return dungShow;
+			case   3:	return gameSTART;
+			case   4:	return controls;
+			case   5:	return credits;
+			case   6:	return debugOPT;
+			case  -1:	return exitOPT;
+			default :	return placeHolder;
+			}
+		}
+
 	}
 
 }

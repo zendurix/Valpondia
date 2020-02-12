@@ -30,7 +30,7 @@ void GAME_charControler::move_level_down(Character* ch)
 			{
 				levelType = dungeon;
 			}
-			g->make_new_level(levelType);
+			//g->make_new_level();
 		}
 		else
 		{
@@ -61,7 +61,6 @@ void GAME_charControler::move_level_down(Character* ch)
 
 		g->levels[levelChange]->set_true_all_changedPrint(); ///////////////
 	}
-	FieldOfView::set_fieldArr(&g->levelActive->field);
 }
 
 void GAME_charControler::move_level_up(Character* ch)
@@ -80,18 +79,64 @@ void GAME_charControler::move_level_up(Character* ch)
 	ch->set_y(g->levels[levelChange]->stairsDown->get_y());
 	g->levels[levelChange]->field[ch->get_y()][ch->get_x()]->go_here(ch);
 	g->levels[levelChange]->set_true_all_changedPrint(); //////////////////////
-	FieldOfView::set_fieldArr(&g->levelActive->field);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 char GAME_charControler::player_turn()
 {
 	char action = Input::user_input_key();
 
-	if (action >= '0' && action <= '9')
+	bool finish = false;
+
+	Connector& connector = g->player->get_staysOn()->connector;
+	if (connector.levelDestination == -10)
 	{
-		g->player->move(action);
+		if (action == connector.pushToGo)
+		{
+			LOG("YOU WALK AWAY FROM YOUR DESTINY...");
+			finish = true;
+		}
 	}
-	else
+	else if (connector.levelDestination != -1)
+	{
+
+		if (action == connector.pushToGo)
+		{
+			finish = true;
+			if (connector.destination == nullptr)
+				g->make_level(connector);
+
+			move_to_level(g->player, connector);
+
+
+		}
+
+
+	}
+
+	if (!finish && action >= '0' && action <= '9')
+	{
+		Character* attackThis = g->player->move_and_attack(action);
+		if (attackThis != nullptr)
+			attack(g->player, attackThis);
+	}
+	else if (!finish)
 	{
 		// to duplicate game state on both windows - to avoid background to "UI's" windows flickering
 		g->Printer->print_field_UPDATE();
@@ -100,14 +145,24 @@ char GAME_charControler::player_turn()
 		{
 			case '+':
 			{
-				if (g->player->get_staysOn()->get_stairsUp())
-					move_level_up(g->player);
+				//if (g->player->get_staysOn()->get_stairsUp())
+				//	move_level_up(g->player);
+				if (g->levelActive->get_stairsUp() != nullptr && g->levelActive->get_stairsUp()->get_wasSeen())
+				{ // go to stairs up if visible
+					char dir = PathFinding::best_dir(&g->levelActive->field, *g->player, g->levelActive->get_stairsUp());
+					g->player->move_and_attack(dir);
+				}
 				break;
 			}
 			case '-':
 			{
-				if (g->player->get_staysOn()->get_stairsDown())
-					move_level_down(g->player);
+				//if (g->player->get_staysOn()->get_stairsDown())
+				//	move_level_down(g->player);
+				if (g->levelActive->get_stairsDown() != nullptr && g->levelActive->get_stairsDown()->get_wasSeen())
+				{ // go to stairs down if visible
+					char dir = PathFinding::best_dir(&g->levelActive->field, *g->player, g->levelActive->get_stairsDown());
+					g->player->move_and_attack(dir);
+				}
 				break;
 			}
 			case 'U':
@@ -139,6 +194,34 @@ char GAME_charControler::player_turn()
 	sleep_for_milliseconds(50);
 	return action;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 void GAME_charControler::place_character_randomly(Character* ch)
 {
@@ -205,22 +288,27 @@ void GAME_charControler::player_equipment_control()
 	const SharedPtr<Item>* eq = g->player->get_equipped_ref();
 	const std::vector<SharedPtr<Item>>* inv = g->player->get_inventory_ref();
 
-	BodyPart choosenBodyPart = UI::player_equipment_selector(eq);
-	int choosenEqIndex = static_cast<int>(choosenBodyPart);
+	BodyPart choosenBodyPart;
+	int choosenEqIndex;
 
-	if (choosenEqIndex != -1)
+	do
 	{
-		if (eq[choosenEqIndex] != nullptr)
+		choosenBodyPart = UI::player_equipment_selector(eq);
+		choosenEqIndex = static_cast<int>(choosenBodyPart);	
+		if (choosenEqIndex != -1)
 		{
-			item_options_control(eq[choosenEqIndex]);
+			if (eq[choosenEqIndex] != nullptr)
+			{
+				item_options_control(eq[choosenEqIndex]);
+			}
+			else
+			{
+				int choosenInvIndex = UI::equip_from_inv_selector(choosenBodyPart, inv);
+				if (choosenInvIndex != -1)
+					g->player->equip_item((*inv)[choosenInvIndex], choosenBodyPart);			
+			}
 		}
-		else
-		{
-			int choosenInvIndex = UI::equip_from_inv_selector(choosenBodyPart, inv);
-			if (choosenInvIndex != -1)
-				g->player->equip_item((*inv)[choosenInvIndex], choosenBodyPart);			
-		}
-	}
+	} while (choosenEqIndex != -1);
 }
 
 void GAME_charControler::item_options_control(SharedPtr<Item> item)
@@ -230,13 +318,15 @@ void GAME_charControler::item_options_control(SharedPtr<Item> item)
 	switch (choosenOpt)
 	{
 	case ItemOpt::look:
-		; // info about obj
-
+		UI::show_item_info(item);
 		break;
 	case ItemOpt::equip:
 	{
 		BodyPart bodypart = UI::choose_bodyPart_to_equip(item, g->player->get_equipped_ref());
-		g->player->equip_item(item, bodypart);
+		if (bodypart != BodyPart::none)
+		{
+			g->player->equip_item(item, bodypart);
+		}
 		break;
 	}
 	case ItemOpt::unequip:
@@ -253,5 +343,77 @@ void GAME_charControler::item_options_control(SharedPtr<Item> item)
 	case ItemOpt::use:
 		// use
 		break;
+	case ItemOpt::none:
+		break;
 	}
+}
+
+
+
+
+
+
+void GAME_charControler::attack(Character* attacker, Character* defender)
+{
+	if (defender->do_dodge() == true)
+	{
+		LOG(defender->get_name() << " dodged");
+	}
+	else 
+	{
+		DMG attackerDMG = attacker->do_attack();
+		DEF defenderDEF = defender->do_defend();
+
+		bool penetrated = (attackerDMG.penetration >= defenderDEF.baseDEF);
+		if (penetrated)
+		{
+			int dmgToArmor = attackerDMG.baseDMG - defenderDEF.baseDEF;
+			// deal dmg to armor
+			int dmgToDefender = attackerDMG.baseDMG;
+			// dmgToDefender -= dmgToArmor; // moze jednak gupi pomysl z tym
+			int fireDmg = attackerDMG.fireDMG - defenderDEF.fireDEF;
+
+			dmgToDefender += fireDmg;
+
+			defender->take_damage(dmgToDefender);
+
+			LOG(attacker->get_name() << " hit " << defender->get_name() << " for " << dmgToDefender << " dmg");
+		}
+		else // not penetrated
+		{
+			int fireDmg = attackerDMG.fireDMG - defenderDEF.fireDEF;
+			defender->take_damage(fireDmg);
+
+			// and dmg to weapon and armor
+
+			LOG(attacker->get_name() << " didn't penetrate " << defender->get_name() << " armor");
+		}
+
+	}
+
+
+
+
+
+}
+
+
+
+
+
+
+void GAME_charControler::move_to_level(Character* ch, Connector connector)
+{
+	g->levelActiveId = connector.levelDestination;
+	g->levelActive = g->levels[g->levelActiveId];
+	ch->set_onLevelID(g->levelActiveId);
+
+	
+	
+	ch->set_fieldArr(&g->levelActive->field);
+	ch->set_staysOn(connector.destination);
+	
+	g->levelActive->field[ch->get_y()][ch->get_x()]->go_here(ch);
+	
+
 }

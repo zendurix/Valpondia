@@ -58,7 +58,7 @@ void UI::init_UI(sf::RenderWindow* win)
 
 		init_windows();
 		init_texts();
-		LOG("User Interface initialized");
+		LOG("User Interface.....................initialized");
 	}
 }
 
@@ -209,7 +209,8 @@ ItemOpt UI::item_options_selector(SharedPtr<Item> item)
 
 	int choosenIndex = UIwin.call_window_return_choosen_indexes(window)[0];
 
-	if		(options[choosenIndex].get_string() == "look")	  ret = ItemOpt::look;
+	if		(choosenIndex == -1)							  ret = ItemOpt::none;
+	else if	(options[choosenIndex].get_string() == "look")	  ret = ItemOpt::look;
 	else if (options[choosenIndex].get_string() == "drop")	  ret = ItemOpt::drop;
 	else if (options[choosenIndex].get_string() == "equip")	  ret = ItemOpt::equip;
 	else if (options[choosenIndex].get_string() == "unequip") ret = ItemOpt::unequip;
@@ -272,7 +273,8 @@ BodyPart UI::choose_bodyPart_to_equip(const SharedPtr<Item> item, const SharedPt
 	UIWindow UIwin(winLength, winHeight, x, y, title, options, charHeight);
 	int bodyPartIndex = UIwin.call_window_return_choosen_indexes(window)[0];
 
-	bodyPartIndex = aviableOptIndexes[bodyPartIndex];
+	if (bodyPartIndex != -1)
+		bodyPartIndex = aviableOptIndexes[bodyPartIndex];
 	ret = static_cast<BodyPart>(bodyPartIndex);
 	return ret;
 }
@@ -323,17 +325,26 @@ int UI::equip_from_inv_selector(BodyPart bodyPartToEquip, const std::vector<Shar
 {
 	std::string bodyPartsStr[BODY_PARTS_COUNT] = { "head   ", "body   ", "hands  ", "legs   ", "rHand  ", "lHand  " };
 	MyText title = strCol("Equip to: ", COL::White);
+	std::vector<std::array<int, 2>> invIndexAndOptIndex;;
 	title += strCol(bodyPartsStr[static_cast<int>(bodyPartToEquip)], COL::White);
 	int charHeight = title.get_charHeight();
 
 	std::vector<MyText> options;
-	for (const SharedPtr<Item> item : *inv) 
+	for (int i = 0, j = 0; i < inv->size(); i++)
 	{
 		if (bodyPartToEquip == BodyPart::lHand || bodyPartToEquip == BodyPart::rHand)
-			if (item->get_bodyPart() == BodyPart::forHands)
-				options.push_back(item->get_name());
-		if (item->get_bodyPart() == bodyPartToEquip)
-			options.push_back(item->get_name());
+			if ((*inv)[i]->get_bodyPart() == BodyPart::forHands)
+			{
+				options.push_back((*inv)[i]->get_name());
+				invIndexAndOptIndex.push_back({ i, j });
+				j++;
+			}
+		if ((*inv)[i]->get_bodyPart() == bodyPartToEquip)
+		{
+			options.push_back((*inv)[i]->get_name());
+			invIndexAndOptIndex.push_back({ i, j });
+			j++;
+		}
 	}
 
 	int x = 100;
@@ -343,5 +354,55 @@ int UI::equip_from_inv_selector(BodyPart bodyPartToEquip, const std::vector<Shar
 
 	UIWindow UIwin(winLength, winHeight, x, y, title, options, charHeight);
 	int choosenIndex = UIwin.call_window_return_choosen_indexes(window)[0];
+
+	for (int i = 0; i < invIndexAndOptIndex.size(); i++)
+	{
+		if (invIndexAndOptIndex[i][1] == choosenIndex)
+		{
+			choosenIndex = invIndexAndOptIndex[i][0];
+			break;
+		}
+	}
+
 	return choosenIndex;
+}
+
+
+
+void UI::show_item_info(const SharedPtr<Item> item)
+{
+	MyText dmg, armor, dodge, name, flavortext;
+	get_item_info_texts(item, dmg, armor, dodge, name, flavortext);
+
+	std::vector<MyText> infoCombined = { flavortext, dmg, armor, dodge };
+
+	int x = 300;
+	int y = 100;
+	int winLength = 600;
+	int winHeight = 400;
+	int charHeight = name.get_charHeight();
+
+	UIWindow UIwin(winLength, winHeight, x, y, name, infoCombined, charHeight);
+	UIwin.set_interactive(false);
+	UIwin.call_window_return_choosen_indexes(window);
+}
+
+
+
+void UI::get_item_info_texts(const SharedPtr<Item> item, MyText& dmg, MyText& armor, MyText& dodge, MyText& name, MyText& flavortext)
+{
+	name = item->get_name();
+	flavortext = item->get_flavorText();
+
+	int dmgMin = item->melee.get_minDmg();
+	int dmgMax = item->melee.get_maxDmg();
+	dmg = strCol("Melee Damage: " + std::to_string(dmgMin) + "-" + std::to_string(dmgMax), COL::White);
+
+	int basicArmor = item->defend.def_baseArmor();
+	if (basicArmor != 0) armor = strCol("Armor: " + std::to_string(basicArmor), COL::White);
+	else 				 armor = strCol("", COL::White);
+
+	int dodgeValue = item->defend.get_dodgeValue();
+	if (dodgeValue != 0) dodge = strCol("Dodge: " + std::to_string(dodgeValue), COL::White);
+	else 				 dodge = strCol("", COL::White);
 }

@@ -12,6 +12,8 @@
 #include <random>
 #include <utility>
 #include <numeric> 
+#include <array>
+#include <fstream>
 		  
 		  
 #include <SFML/Graphics.hpp>

@@ -16,6 +16,8 @@ private:
 	GAME_charControler(GAME* game);
 	~GAME_charControler();
 
+
+
 public:
 	char player_turn();
 	void place_character_randomly(Character* ch);
@@ -25,5 +27,9 @@ public:
 	void player_inventory_control();
 	void player_equipment_control();
 	void item_options_control(SharedPtr<Item> item);
+	void attack(Character* attacker, Character* defender);
+
+
+	void move_to_level(Character* character, Connector connector);
 };
 

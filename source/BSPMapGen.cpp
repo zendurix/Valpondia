@@ -25,7 +25,7 @@ std::vector<SharedPtr<Room>> BspMapGen::make_dung_map_ret_rooms(Vector2D<SharedP
 	}
 	LOG("BSP tree restart count: " << restartCount);
 
-	make_whole_map_obstacle();
+	make_whole_map_obstacle(fieldRef);
 	tree.fill_leaves_with_rooms(&rooms);
 	tree.connect_all_rooms();
 
@@ -140,6 +140,7 @@ bool BspMapGen::split_node(SharedPtr<Place> parentField, std::unique_ptr<Node> &
 	
 	if (vertical)	fieldX += length1;
 	else 			fieldY += height1;
+	fieldY = (fieldY == MYHEIGHT) ? fieldY - 1 : fieldY;
 
 	parentField = fieldRef[fieldY][fieldX];
 
@@ -231,7 +232,7 @@ SharedPtr<Room> BspMapGen::make_random_room_in_node(int nodeIndex)
 	else									y = parentY;
 
 	room = std::make_shared<Room>();
-	make_room("rectangle", x, y, length, height, room);
+	make_room(fieldRef, x, y, length, height, room);
 	nodes[nodeIndex]->room = room;
 	return room;
 }

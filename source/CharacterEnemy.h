@@ -9,6 +9,8 @@
 enum ENattitude { hostile = 0, neutral, friendly };
 enum ENstate { sleeping = 0, watching, angry };
 
+enum EnemyType {rat= 0 , };
+
 class CharacterEnemy : public Character
 {
 private:
@@ -17,6 +19,10 @@ private:
 
 
 public:
+
+	static SharedPtr<CharacterEnemy> make_enemy(EnemyType type, short x, short y, std::vector<std::vector<SharedPtr<Place> >> *field);
+
+
 	CharacterEnemy(short x, short y, std::vector<std::vector<SharedPtr<Place> >> *field);
 	~CharacterEnemy();
 	

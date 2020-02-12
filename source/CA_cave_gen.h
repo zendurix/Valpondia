@@ -4,21 +4,14 @@
 
 
 #include "CONFIGURATION.h"
-
 #include "Input.h"
 #include "Place.h"
 #include "RNG.h"
 #include "GAME.h" 
 
 
-// parameters for Cellular Automata
-const int ALIVE_CHANCE_PERCENT = 45;
-const int STEP_LIMIT = 8;
-const int DEATH_LIMIT = 3;
-const int BIRTH_LIMIT = 4;
-const int MIN_CAVE_SIZE_PERCENT = 50;
 
-typedef struct CA_Place
+struct CA_Place
 {
 	bool isAlive = false;   // !isAlive == isObstacle , isAlive == floor
 	bool isAliveNext = false;
@@ -26,15 +19,27 @@ typedef struct CA_Place
 	int caveIndex = 0;
 	int x = -1;
 	int y = -1;
-}CA_Place;
+};
+
 
 class CA_cave_gen
 {
+public:	
+
+	static void make_cave_map(Vector2D<SharedPtr<Place>>& field, bool testing = false);
+
 private:
+	// parameters for Cellular Automata
+	const int ALIVE_CHANCE_PERCENT = 45;
+	const int STEP_LIMIT = 8;
+	const int DEATH_LIMIT = 3;
+	const int BIRTH_LIMIT = 4;
+	const int MIN_CAVE_SIZE_PERCENT = 50;
+		
 	CA_Place CA_field[MYHEIGHT][MYLENGTH];
 
-public:
-	CA_cave_gen(bool testing, std::vector<std::vector<SharedPtr<Place> >> &fieldArr);
+
+	CA_cave_gen(Vector2D<SharedPtr<Place>>& fieldArr, bool testing);
 	~CA_cave_gen();
 
 	void set_random_state();

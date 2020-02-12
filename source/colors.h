@@ -22,6 +22,7 @@ public:
 	inline static const sf::Color lightSalmon = sf::Color(255, 160, 122);
 	inline static const sf::Color crimson = sf::Color(220, 20, 60);
 
+	inline static const sf::Color hotPink = sf::Color(255, 105, 180);
 
 	// HP COLORS
 	inline static sf::Color hpProc100 = limeGreen;

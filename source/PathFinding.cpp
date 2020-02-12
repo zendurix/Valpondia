@@ -33,8 +33,9 @@ char PathFinding::calculate_dir(SharedPtr<Place> origin, SharedPtr<Place> target
 
 
 
-char PathFinding::best_dir(Character character, SharedPtr<Place> target)
+char PathFinding::best_dir(Vector2D<SharedPtr<Place>> *field, Character character, SharedPtr<Place> target)
 {	
+	fieldRef = field;
 	std::pair<int, char> result = Astar_path_dir_dist(character.get_staysOn(), target);
 
 	return result.first;

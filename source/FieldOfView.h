@@ -23,9 +23,9 @@ private:
 	static SharedPtr<Place>  step_tracer(SharedPtr<Place> tracer, char& quarter, char&& dir);
 
 public:
-	static void update_view( SharedPtr<Place> placeChar);
 
-	static void set_fieldArr(Vector2D<SharedPtr<Place>>* fieldPtr) { FieldOfView::fieldArr = fieldPtr; }
+	static void update_view(Vector2D<SharedPtr<Place>> *field, SharedPtr<Place> placeChar);
+
 };
 
 

@@ -31,6 +31,8 @@ UIWindow::UIWindow(int length, int height, int x, int y, MyText titleSet, std::v
 	optionsPerPage = height / (charSize + SPACE_BETWEEN_LINES_Y*6);
 	showIndexFirst = 0;
 	showIndexLast = showIndexFirst + optionsPerPage;
+
+	interactive = true;
 }
 
 
@@ -96,7 +98,9 @@ void UIWindow::show_window(sf::RenderWindow* win)
 			myText = choosableContent[i];
 			myText.setPosition(x, y);
 
-			if (i == highlightOptionIndex) myText.set_color_first(sf::Color::Red);
+			if (interactive)
+				if (i == highlightOptionIndex) 
+					myText.set_color_first(sf::Color::Red);
 
 			if (addTickBoxes)
 			{
@@ -132,6 +136,10 @@ void UIWindow::handle_input()
 {
 	sleep_for_milliseconds(150);
 	char input = Input::user_input_key();
+	if (!interactive)
+		while (input != STD_ESC)
+			input = Input::user_input_key();
+
 	switch (input)
 	{
 	case  '8':		highlightOptionIndex--;		break;

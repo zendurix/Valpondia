@@ -47,8 +47,6 @@ T vector_pop(std::vector<T> &vec, T elem)
 	return ret;
 }
 
-
-
 template <typename T>
 std::vector<T> get_vect_items_from_indexes(std::vector<T> &vec, std::vector<int> indexes)
 {
@@ -58,3 +56,17 @@ std::vector<T> get_vect_items_from_indexes(std::vector<T> &vec, std::vector<int>
 	return ret;
 }
 
+template <typename T>
+T random_from_vect(std::vector<T> vect)
+{
+	int max = vect.size() - 1;
+	int randNumb = random(0, max);
+	return vect[randNumb];
+}
+
+
+template <typename T>
+bool vector_contains(std::vector<T> &vec, T elem)
+{
+	return (std::find(vec.begin(), vec.end(), elem) != vec.end());
+}

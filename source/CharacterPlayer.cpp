@@ -23,7 +23,7 @@ CharacterPlayer::CharacterPlayer(short x, short y, std::vector<std::vector<Share
 	
 	fieldArr = field;
 
-	view = 20;
+	view = 100;
 
 	staysOn = (*fieldArr)[y][x];
 	(*fieldArr)[y][x]->go_here(this);

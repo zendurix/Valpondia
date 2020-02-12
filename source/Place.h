@@ -10,6 +10,13 @@
 
 class Room;
 
+struct Connector
+{
+	SharedPtr<Place> destination = nullptr;
+	char pushToGo;
+	int levelDestination = -1;
+};
+
 class Place
 {
 private:
@@ -34,6 +41,7 @@ private:
 	     stairsDown,
 	     stairsUp;
 
+
 	Character* characterHere;
 	SharedPtr <Room> roomHere;
 
@@ -43,6 +51,11 @@ private:
 //private end
 
 public:
+	Connector connector;
+
+
+
+
 	Place(short level);
 	~Place();
 
@@ -97,4 +110,6 @@ public:
 //public end
 
 };
+
+
 

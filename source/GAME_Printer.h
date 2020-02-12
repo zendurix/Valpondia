@@ -14,9 +14,11 @@ friend GAME;
 private:
 	GAME* g;
 	std::vector <sf::Sprite> textures;
-	enum textureNames { rock_wall = 0, floor_tile, stone_wall, player_tile, sword_tile };
+	std::vector <sf::Sprite> texturesASCII;
+	enum textureNames { rock_wall = 0, floor_tile, stone_wall, player_tile, sword_tile, rat_tile };
 
 	void load_textures();
+	void load_textures_ASCII();
 
 	GAME_Printer(GAME* game);
 	~GAME_Printer();
