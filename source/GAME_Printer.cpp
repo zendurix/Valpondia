@@ -9,6 +9,7 @@ GAME_Printer::GAME_Printer(const GAME& game)
 {
 	load_textures();
 	load_textures_ASCII();
+	LOG("GAME Printer.......................initialized");
 }
 
 GAME_Printer::~GAME_Printer()
@@ -204,48 +205,45 @@ void GAME_Printer::setupTexture(sf::Sprite &sprite, SharedPtr<Place> place, bool
 
 void GAME_Printer::load_textures()
 {
-	sf::Sprite rock_wall;
-	sf::Sprite floor_tile;
-	sf::Sprite stone_wall;
-	sf::Sprite player_tile;
-	sf::Sprite sword_tile;
-
+	sf::Sprite sprite;
 	std::string texturesPath = "../res/textures";
+	sf::Texture* texture;
 
-	sf::Texture* texture1 = new sf::Texture;
-	LOG_NEW;
-	texture1->loadFromFile(texturesPath + "/wallRock.png");
-	rock_wall.setTexture(*texture1);
-	textures.push_back(rock_wall);
+	texture = new sf::Texture;	LOG_NEW;
+	texture->loadFromFile(texturesPath + "/wallRock.png");
+	sprite.setTexture(*texture);
+	textures.push_back(sprite);
 	LOG("wallRock.png.......................loaded");
 
-	sf::Texture* texture3 = new sf::Texture;
-	LOG_NEW;
-	texture3->loadFromFile(texturesPath + "/floor.png");
-	floor_tile.setTexture(*texture3);
-	textures.push_back(floor_tile);
+	texture = new sf::Texture;	LOG_NEW;
+	texture->loadFromFile(texturesPath + "/floor.png");
+	sprite.setTexture(*texture);
+	textures.push_back(sprite);
 	LOG("floor.png..........................loaded");
 
-	sf::Texture* texture2 = new sf::Texture;
-	LOG_NEW;
-	texture2->loadFromFile(texturesPath + "/wallBrick.png");
-	stone_wall.setTexture(*texture2);
-	textures.push_back(stone_wall);
+	texture = new sf::Texture;	LOG_NEW;
+	texture->loadFromFile(texturesPath + "/wallBrick.png");
+	sprite.setTexture(*texture);
+	textures.push_back(sprite);
 	LOG("wallBrick.png......................loaded");
 
-	sf::Texture* texture4 = new sf::Texture;
-	LOG_NEW;
-	texture4->loadFromFile(texturesPath + "/player.png");
-	player_tile.setTexture(*texture4);
-	textures.push_back(player_tile);
+	texture = new sf::Texture;	LOG_NEW;
+	texture->loadFromFile(texturesPath + "/player.png");
+	sprite.setTexture(*texture);
+	textures.push_back(sprite);
 	LOG("player.png.........................loaded");
 
-	sf::Texture* texture5 = new sf::Texture;
-	LOG_NEW;
-	texture5->loadFromFile(texturesPath + "/sword.png");
-	sword_tile.setTexture(*texture5);
-	textures.push_back(sword_tile);
+	texture = new sf::Texture;	LOG_NEW;
+	texture->loadFromFile(texturesPath + "/sword.png");
+	sprite.setTexture(*texture);
+	textures.push_back(sprite);
 	LOG("sword.png..........................loaded");
+
+	texture = new sf::Texture;	LOG_NEW;
+	texture->loadFromFile(texturesPath + "/rat.png");
+	sprite.setTexture(*texture);
+	textures.push_back(sprite);
+	LOG("rat.png............................loaded");
 }
 
 

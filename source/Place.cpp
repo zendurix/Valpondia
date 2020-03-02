@@ -103,6 +103,10 @@ SharedPtr<sf::Sprite> Place::get_sprite_to_print()
 		else
 			sprite->setColor(sf::Color::Black);
 	}
+	else
+	{
+		sprite->setColor(sf::Color::White);
+	}
 
 	return sprite;
 }

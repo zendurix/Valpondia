@@ -9,6 +9,7 @@ class ECS;
 class Place;
 class Connector;
 class GAME_Printer;
+class GAME_Factory;
 
 class GAME
 {
@@ -38,6 +39,7 @@ public:
 
 	// COMPONENTS:
 	GAME_Printer* Printer;
+	GAME_Factory* Factory;
 
 
 	static GAME* getInstance();
@@ -57,7 +59,8 @@ public:
 
 
 	// getters
-	inline Level* get_levelActive()		   { return levelActive; }
-	inline std::vector <Level*>* get_levels() { return &levels; }
+	inline Level* get_levelActive()					{ return levelActive; }
+	inline std::vector<Level*>* get_levels()		{ return &levels; }
+	inline SharedPtr<Place> get_place(Position pos) { return levels[pos.levelID]->get_fieldRef()[pos.y][pos.x]; }
 };
 

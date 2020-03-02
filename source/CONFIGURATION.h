@@ -4,8 +4,7 @@
 #include "pch.h"
 
 // game modes:
-const bool DEBUG_MENU = true; // show simplified menu
-const bool GAME_MODE_ASCII = true;
+const bool GAME_MODE_ASCII = false;
 
 
 enum class LvType { cave = 0, dungeon = 1, fromFile = 2, ruins };

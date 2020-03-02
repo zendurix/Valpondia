@@ -26,6 +26,8 @@ public:
 
 	static void update_view(Vector2D<SharedPtr<Place>> *field, SharedPtr<Place> placeChar, int viewDistance);
 
+	static bool tracer_point_to_point(SharedPtr<Place> start, SharedPtr<Place> end, void(*action)(SharedPtr<Place>) = nullptr);
+
 };
 
 

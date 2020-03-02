@@ -2,6 +2,7 @@
 #include "GAME.h"
 
 #include "GAME_Printer.h"
+#include "GAME_Factory.h"
 #include "general_purpose_func.h"
 #include "Level.h"
 #include "Place.h"
@@ -58,7 +59,7 @@ GAME::~GAME()
 void GAME::init()
 {
 	Printer = new GAME_Printer(*this);
-	LOG("GAME Printer.......................initialized");
+	Factory = new GAME_Factory(*this, &Printer->textures);
 
 	ecs = std::make_unique<ECS>();
 

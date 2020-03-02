@@ -1,10 +1,6 @@
 #pragma once
 
-#include "general_purpose_func.h"
-#include "Input.h"
-#include "UIWindow.h"
-#include "MyText.h"
-
+#include "../CONFIGURATION.h"
 
 
 class MENU
@@ -17,10 +13,8 @@ public:
 	MENU(sf::RenderWindow* window, sf::Text text);
 	~MENU();
 
-
 	MENUopt show_menu_ret_opt();
 	void show_controls();
 	void show_credits();
-	void show_debug_options();
 };
 

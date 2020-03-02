@@ -2,6 +2,7 @@
 
 #include "../ECS/System.h"
 
+class Place;
 
 class Act final : public System
 {
@@ -12,4 +13,7 @@ public:
 	void init() override;
 	void update(Entity entity) override;
 	void update_components() override;
+
+
+	bool sees_this_place(Entity entity, SharedPtr<Place> place);
 };

@@ -1,7 +1,9 @@
-#pragma once
-
 #include "pch.h"
 #include "UIWindow.h"
+
+#include "../CONFIGURATION.h"
+#include "../general_purpose_func.h"
+#include "../Input.h"
 
 
 UIWindow::UIWindow(int length, int height, int x, int y, MyText titleSet, std::vector<MyText> options,
@@ -49,34 +51,33 @@ void UIWindow::add_tickBoxes()
 
 
 
-// std::vector<int> UIWindow::call_window_return_choosen_indexes(sf::RenderWindow* win)
-// {
-// 	std::vector<SharedPtr<Item>> choosen = {};
-// 	chosenIndexes.clear();
-// 	highlightOptionIndex = 0;
-// 	choosed = false;
-// 
-// 	while (!choosed)
-// 	{
-// 		show_window(win);
-// 		show_window(win); // to avoid flickering
-// 		if (choosableContent.size() != 0)
-// 		{
-// 			handle_input();
-// 			if (highlightOptionIndex >= showIndexLast)
-// 				scroll_down();
-// 			if (highlightOptionIndex <= showIndexFirst && highlightOptionIndex != 0)
-// 				scroll_up();
-// 		}
-// 		else
-// 		{
-// 			Input::wait_for_input(inputType::space);
-// 			chosenIndexes.push_back(-1);
-// 			choosed = true;
-// 		}
-// 	}
-// 	return chosenIndexes;
-// }
+std::vector<int> UIWindow::call_window_return_choosen_indexes(sf::RenderWindow* win)
+{
+	chosenIndexes.clear();
+	highlightOptionIndex = 0;
+	choosed = false;
+
+	while (!choosed)
+	{
+		show_window(win);
+		show_window(win); // to avoid flickering
+		if (choosableContent.size() != 0)
+		{
+			handle_input();
+			if (highlightOptionIndex >= showIndexLast)
+				scroll_down();
+			if (highlightOptionIndex <= showIndexFirst && highlightOptionIndex != 0)
+				scroll_up();
+		}
+		else
+		{
+			Input::wait_for_input(inputType::space);
+			chosenIndexes.push_back(-1);
+			choosed = true;
+		}
+	}
+	return chosenIndexes;
+}
 
 
 

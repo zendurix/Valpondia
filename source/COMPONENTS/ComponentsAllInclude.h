@@ -3,6 +3,7 @@
 #include "pch.h"
 
 #include "Player.h"
+#include "AI.h"
 #include "Position.h"
 #include "Render.h"
 #include "Obstacle.h"
@@ -16,4 +17,4 @@
 
 
 
-const int MAX_COMPONENTS = 9;  // increase this each time new component is added to source
+const int MAX_COMPONENTS = 10;  // increase this each time new component is added to source

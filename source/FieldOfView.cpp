@@ -5,6 +5,24 @@
 #include "Place.h"
 
 
+static bool tracer_point_to_point(SharedPtr<Place> start, SharedPtr<Place> end, void(*action)(SharedPtr<Place>) = nullptr)
+{
+	int x1 = start->get_x();	int y1 = start->get_y();
+	int x2 = end->get_x();		int y2 = end->get_y();
+
+	double aSide = abs(x1 - x2);
+	double bSide = abs(y1 - y2);
+	double cSide = sqrt(aSide*aSide + bSide *bSide);
+
+	double a = 0.0, b = 0.0;
+
+	double angle = 0;
+}
+
+
+
+
+
 void FieldOfView::update_view(Vector2D<SharedPtr<Place>> *field, SharedPtr<Place> placeChar, int viewDistance)
 {
 	fieldArr = field;
@@ -18,7 +36,6 @@ void FieldOfView::update_view(Vector2D<SharedPtr<Place>> *field, SharedPtr<Place
 	qrt3.join();
 	qrt4.join();
 }
-
 
 void FieldOfView::update_1qrt(SharedPtr<Place> placeChar, int viewDistance)
 {

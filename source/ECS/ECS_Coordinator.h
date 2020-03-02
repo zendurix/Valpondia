@@ -145,6 +145,7 @@ public:
 		register_component<Actor>();
 		register_component<Item>();
 		register_component<Statistics>();
+		register_component<AI>();
 
 
 

@@ -1,9 +1,6 @@
 #pragma once
 
-#include "CONFIGURATION.h"
-#include "Input.h"
 #include "MyText.h"
-
 
 
 class UIWindow
@@ -46,13 +43,13 @@ private:
 public:
 	UIWindow(int length, int height, int x, int y, MyText titleSet, std::vector<MyText> options, int CharSize,
 		bool fit = true, int outThicc = WIN_OUTLINE_THICC);
-	~UIWindow() {};
+	inline ~UIWindow() {};
 
 
 	std::vector<int> call_window_return_choosen_indexes(sf::RenderWindow* win);
 
 	void add_tickBoxes();
-	void set_interactive(bool set) { interactive = set; }
+	inline void set_interactive(bool set) { interactive = set; }
 
 
 

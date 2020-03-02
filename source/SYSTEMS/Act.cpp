@@ -22,7 +22,7 @@ void Act::update(Entity entity)
 {
 	if (componentManager->entity_have_this_component<Player>(entity))
 		act_player(entity);
-	else
+	else if (componentManager->entity_have_this_component<AI>(entity))
 		act_AI(entity);
 }
 
@@ -30,6 +30,7 @@ void Act::update(Entity entity)
 void Act::update_components()
 {
 	components.insert(componentManager->get_ComponentType<Actor>());
+	components.insert(componentManager->get_ComponentType<Position>());
 }
 
 
@@ -134,7 +135,48 @@ void Act::act_player(Entity player)
 
 
 
-void Act::act_AI(Entity ai)
+void Act::act_AI(Entity aiEnt)
 {
+	AI ai = componentManager->get_component<AI>(aiEnt);
+
+
+	switch (ai.behavior)
+	{
+	case Behavior::guarding:
+		{
+			switch (ai.attitude)
+			{
+				case Attitude::hostile:
+				{
+
+
+				}
+				break;
+			}
+
+		}
+		break;
+
+
+
+	}
+
+
+
+
+
+}
+
+
+
+
+
+bool Act::sees_this_place(Entity entity, SharedPtr<Place> place)
+{
+	Position pos = componentManager->get_component<Position>(entity);
+
+	SharedPtr<Place> entityPlace = gamePtr->get_place(pos);
+
+
 
 }
