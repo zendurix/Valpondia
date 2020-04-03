@@ -1,0 +1,60 @@
+#pragma once
+// random map generator, based on BSP  (Binary Space Partitioning using binary tree)
+// makes FULL binary tree to given max level
+/*    EXAMPLE (maxlevel == 2):
+					0            LEVEL 0:  main root node
+				   / \
+				 /     \
+			   1         2		 LEVEL 1
+			  / \       / \
+			 /   \     /   \
+			3	  4   5     6    LEVEL 2: last level, leaves
+										  amount of nodes on that level == 2^maxlevel
+										  amount of leaves is amount of rooms to be placed
+	// after placing them all rooms are coneccted
+	// connections will be: 3=4, 5=6, and randomly (3 || 4)=(5 || 6), so all branchess will be connected
+*/
+
+#include "../CONFIGURATION.h"
+#include "MapGen.h"
+
+class Place;
+class Level;
+class Room;
+class Node;
+
+class BspMapGen : public MapGen
+{
+private:
+	int treeHeight;
+	std::vector<UniquePtr<Node>> nodes;
+	Vector2D<SharedPtr<Place>>& fieldRef;
+
+	BspMapGen(Vector2D<SharedPtr<Place>> &field, int height);
+	~BspMapGen();
+	void RESET_NodeClass();
+	void RESET_field();
+
+	void split_map();
+
+	bool split_node(SharedPtr<Place> parentField, std::unique_ptr<Node> &parent, int level); //ret false if error
+	void split_horizontal(std::unique_ptr<Node> &parent, int& y, int& length1, int& length2, int& height1, int& height2);
+	void split_vertical(std::unique_ptr<Node> &parent, int& x, int& length1, int& length2, int& height1, int& height2);
+
+	void fill_leaves_with_rooms(std::vector <SharedPtr <Room>> *rooms);
+	SharedPtr<Room> make_random_room_in_node(int nodeIndex);
+
+	void connect_all_rooms();
+
+	void connect_2_rooms(SharedPtr<Place> searcher1, SharedPtr<Place>  searcher2);
+
+	void chceck_sizes(int levelmax, int MIN_SIZE);
+
+	void add_stairs_down(std::vector<SharedPtr<Room>> rooms);
+
+public:
+
+	static std::vector<SharedPtr<Room>> make_dung_map_ret_rooms(Level& level, int treeHeight);
+
+};
+

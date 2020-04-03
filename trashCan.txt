@@ -1,0 +1,328 @@
+	
+	
+	//*//*//*//*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	//*//*//*//*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+
+	
+			"\n   ---alternate movement without numPad--- \n"
+		" q   ^  e \n"
+		"   \\ | /    \n"
+		" < - @ - > \n"
+		"   / | \\    \n"
+		" a   \\/   d \n"
+		" ^, \\/, <, > : up, down, left, right arrows \n\n"	
+	
+	
+	//*//*//*//*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	
+	
+	
+	if (DEBUG_MENU)
+	{
+		text.setString
+		(
+			"     ---MENU--- \n"
+			" 1 - make random cave map \n"
+			" 2 - make random dungeon map \n"
+			" 3 - NEW GAME\n"
+			" 4 - controls \n"
+			" 5 - credits \n"
+			" 6 - DEBUG OPTIONS \n"
+			" space in game - go back to menu \n"
+			" ESC - exit game\n"
+		);
+		windowHandle->clear();
+		windowHandle->draw(text);
+		windowHandle->display();
+
+		char option;
+
+		while (1)
+		{
+			option = Input::user_input_key();
+			switch (option)
+			{
+			case '1':			return MENUopt::caveShow;
+			case '2':			return MENUopt::dungShow;
+			case '3':			return MENUopt::gameSTART;
+			case '4':			return MENUopt::controls;
+			case '5':			return MENUopt::credits;
+			case '6':			return MENUopt::debugOPT;
+			case STD_ESC:		return MENUopt::exitOPT;
+			default:			return MENUopt::placeHolder;
+			}
+		}
+	}
+
+
+
+	void MENU::show_debug_options()
+{
+	text.setString
+	(
+		"   ---DEBUG OPTIONS---\n"
+		" 1 - make cave map 100 times	\n"
+		" 2 - make dungeon map 100 times    \n"
+		" space - back to MENU"
+	);
+	windowHandle->clear();
+	windowHandle->draw(text);
+	windowHandle->display();
+}
+
+
+	//*//*//*//*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	
+
+
+
+
+
+
+
+
+	//*//*//*//*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	
+	inline Signature make_signature(Entity entity)
+	{
+		Signature entitySignature;
+		for (auto& pair : componentArrays)
+		{
+			if (pair.second->entity_have_this_component(entity))
+				entitySignature.set((int)componentTypes[pair.first], 1);
+			else
+				entitySignature.set((int)componentTypes[pair.first], 0);
+		}
+		LOG("ENTITY " << entity << " signature set to: " << entitySignature);
+		//int i = 0;
+		//for (auto& pair : componentArrays)
+		//{
+		//	if (entitySignature[i] == 1)
+		//	{
+		//		LOG("	HAVE: " << pair.first << " type " << (int)componentTypes[pair.first] << " i " << i );
+		//	}
+		//	i++;
+		//}
+		return entitySignature;
+	}
+
+//*//*//*//*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	
+
+
+
+
+
+
+
+
+
+//*//*//*//*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	
+
+void GAME_CharController::pick_up_item(Character* ch)
+{
+	g->reset_visibility(*g->player); // to avoid flickering tiles
+	g->Printer->print_field_UPDATE();
+
+	std::vector<SharedPtr<Item>> *items = ch->get_staysOn()->get_itemsHere_ptr();
+	if (items->size() == 0)
+	{
+		LOG("NO ITEMS HERE"); // add in game message
+	}
+	else
+	{
+		std::vector<int> pickedIndexes = UI::pickUp_items_selector(items);
+
+		std::vector<SharedPtr<Item>> picked = get_vect_items_from_indexes(*items, pickedIndexes);
+		for (SharedPtr<Item> item : picked)
+		{
+			ch->pick_item(item);
+			ch->get_staysOn()->pick_up(item);
+		}
+	}
+}
+
+
+
+
+void GAME_CharController::player_inventory_control()
+{
+	int choosenIndex = 0;
+	const std::vector<SharedPtr<Item>>* inventory = g->player->get_inventory_ref();
+	while (choosenIndex != -1)
+	{
+		choosenIndex = UI::player_inventory_selector(inventory);
+
+		if (choosenIndex != -1)
+		{
+			item_options_control((*inventory)[choosenIndex]);
+		}
+	}
+}
+
+
+void GAME_CharController::player_equipment_control()
+{
+	const SharedPtr<Item>* eq = g->player->get_equipped_ref();
+	const std::vector<SharedPtr<Item>>* inv = g->player->get_inventory_ref();
+
+	BodyPart choosenBodyPart;
+	int choosenEqIndex;
+
+	do
+	{
+		choosenBodyPart = UI::player_equipment_selector(eq);
+		choosenEqIndex = static_cast<int>(choosenBodyPart);	
+		if (choosenEqIndex != -1)
+		{
+			if (eq[choosenEqIndex] != nullptr)
+			{
+				item_options_control(eq[choosenEqIndex]);
+			}
+			else
+			{
+				int choosenInvIndex = UI::equip_from_inv_selector(choosenBodyPart, inv);
+				if (choosenInvIndex != -1)
+					g->player->equip_item((*inv)[choosenInvIndex], choosenBodyPart);			
+			}
+		}
+	} while (choosenEqIndex != -1);
+}
+
+void GAME_CharController::item_options_control(SharedPtr<Item> item)
+{
+	ItemOpt choosenOpt = UI::item_options_selector(item);
+
+	switch (choosenOpt)
+	{
+	case ItemOpt::look:
+		UI::show_item_info(item);
+		break;
+	case ItemOpt::equip:
+	{
+		BodyPart bodypart = UI::choose_bodyPart_to_equip(item, g->player->get_equipped_ref());
+		if (bodypart != BodyPart::none)
+		{
+			g->player->equip_item(item, bodypart);
+		}
+		break;
+	}
+	case ItemOpt::unequip:
+	{
+		BodyPart bodypart = item->get_wornOnBodyPart();
+		g->player->un_equip_item(item, bodypart);
+		break;
+	}
+	case ItemOpt::drop:
+		if (item->get_isWorn())
+			g->player->un_equip_item(item, item->get_wornOnBodyPart());
+		g->player->drop_item(item);
+		break;
+	case ItemOpt::use:
+		// use
+		break;
+	case ItemOpt::none:
+		break;
+	}
+}
+
+
+
+
+
+
+void GAME_CharController::attack(Character* attacker, Character* defender)
+{
+	if (defender->do_dodge() == true)
+	{
+		LOG(defender->get_name() << " dodged");
+	}
+	else 
+	{
+		DMG attackerDMG = attacker->do_attack();
+		DEF defenderDEF = defender->do_defend();
+
+		bool penetrated = (attackerDMG.penetration >= defenderDEF.baseDEF);
+		if (penetrated)
+		{
+			int dmgToArmor = attackerDMG.baseDMG - defenderDEF.baseDEF;
+			// deal dmg to armor
+			int dmgToDefender = attackerDMG.baseDMG;
+			// dmgToDefender -= dmgToArmor; // moze jednak gupi pomysl z tym
+			int fireDmg = attackerDMG.fireDMG - defenderDEF.fireDEF;
+
+			dmgToDefender += fireDmg;
+
+			defender->take_damage(dmgToDefender);
+
+			LOG(attacker->get_name() << " hit " << defender->get_name() << " for " << dmgToDefender << " dmg");
+		}
+		else // not penetrated
+		{
+			int fireDmg = attackerDMG.fireDMG - defenderDEF.fireDEF;
+			defender->take_damage(fireDmg);
+
+			// and dmg to weapon and armor
+
+			LOG(attacker->get_name() << " didn't penetrate " << defender->get_name() << " armor");
+		}
+
+	}
+
+
+
+
+
+}
+
+
+//*//*//*//*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
